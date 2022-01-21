@@ -3,7 +3,36 @@ canvas {
   top: 0;
   left: 0;
 }
+
+:root {
+  font-family: 'Cabin', sans-serif;
+  --primary-color: #192841;
+}
 main {
-  height: 500vh;
   position: absolute;
+  
+  width: 100%;
+}
+header {
+  display: flex;
+  align-items: center;
+  height: 130vh;
+  position: relative;
+  color: var(--primary-color);
+  text-transform: uppercase;
+  font-size: 7vmin;
+  padding-left: 10%;
+  padding-right: 10%;
+}
+
+.section {
+  display: flex;
+  align-items: center;
+  height: 130vh;
+  position: relative;
+  color: var(--primary-color);
+  text-transform: uppercase;
+  font-size: 7vmin;
+  padding-left: 10%;
+  padding-right: 10%;
 }
