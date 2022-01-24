@@ -107,7 +107,7 @@ scene.add(gridHelper);
 
 //scroll animation
 let scrollY = window.scrollY;
-window.addEventListener("scroll", () => {
+window.addEventListener('scroll', () => {
   scrollY = window.scrollY;
 });
 
@@ -116,14 +116,14 @@ const cursor = {
   x: 0,
   y: 0
 };
-window.addEventListener("mousemove", (event) => {
+window.addEventListener('mousemove', (event) => {
   cursor.x = event.clientX / window.innerWidth - 0.5; //range of -.5, 5
   cursor.y = event.clientY / window.innerHeight - 0.5; //range of -.5, 5
   console.log(cursor);
 });
 
 //resize window 
-window.addEventListener("resize", () => {
+window.addEventListener('resize', () => {
   windowSize.width = window.innerWidth;
   windowSize.height = window.innerHeight;
 
