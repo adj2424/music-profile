@@ -2,15 +2,13 @@ import './style.css';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
-
-
-
-// setup
+/**
+ * Set up
+ */
 const windowSize = {
   width: window.innerWidth,
   height: window.innerHeight
 };
-
 const scene = new THREE.Scene();
 
 //camera group
@@ -22,73 +20,72 @@ cameraGroup.add(camera);
 
 const renderer = new THREE.WebGLRenderer({
   canvas: document.querySelector('#bg')!,
+  antialias: true
 });
 
+//all child objects where it will be animated through tick method
+let updatables: any = [];
 
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(windowSize.width, windowSize.height);
 camera.position.setZ(5);
 renderer.render(scene, camera);
 
-//add background
+/**
+ * Background
+ */
 const background = new THREE.TextureLoader().load('/background.jpg');
 scene.background = background;
 
 //add background stars
-function genStar() {
-  const geometryStar = new THREE.TorusKnotGeometry(1, .1, 30, 10);
-  const materialStar = new THREE.MeshBasicMaterial({
-    wireframe: true,
-    color: 0x0000ff
-  });
-  const star = new THREE.Mesh(geometryStar, materialStar);
-  const x = (Math.random() * (100 + 100)) - 100;
-  const y = -(Math.random() * (100 + 100));
-  const z = (Math.random() * (100 + 100)) - 100;
-
-  star.position.set(x, y, z);
-  return star;
-
-
+function genStars(num: number) {
+  for (let i = 0; i < num; i++){
+    const geometryStar = new THREE.TorusKnotGeometry(1, .1, 30, 10);
+    const materialStar = new THREE.MeshBasicMaterial({
+      wireframe: true,
+      color: 0x0000ff
+    });
+    const star = new THREE.Mesh(geometryStar, materialStar);
+    const x = (Math.random() * (100 + 100)) - 100;
+    const y = -(Math.random() * (100 + 100));
+    const z = (Math.random() * (100 + 100)) - 100;
+    updatables.push(star);
+    star.position.set(x, y, z);
+    star.tick = (delta: number) => {
+      star.rotation.x += 1 * delta;
+    };
+    scene.add(star);
+  }
 }
-const starGroup = new THREE.Group();
-for (let i = 0; i < 100; i++) {
-  let star = genStar();
-  starGroup.add(star);
-}
-scene.add(starGroup);
+genStars(100);
 
-//add light source
+/**
+ * Light Source
+ */
 const ambientLight = new THREE.AmbientLight(0xffffff);
 scene.add(ambientLight);
 
-const objDistance = 10.5;
-const headerDistance = 11.5;
-
-// torus
+/**
+ * Torus
+ */
 const geometry = new THREE.TorusGeometry(1, .5, 16, 100);
 const material = new THREE.MeshToonMaterial({
   color: 0xff0000,
   wireframe: true
 });
 const torus0 = new THREE.Mesh(geometry, material);
-const torus1 = new THREE.Mesh(geometry, material);
-const torus2 = new THREE.Mesh(geometry, material);
-const torus3 = new THREE.Mesh(geometry, material);
-const torus4 = new THREE.Mesh(geometry, material);
+torus0.position.set(0, -5, 0);
+updatables.push(torus0);
+scene.add(torus0);
+torus0.tick = (delta: number) => {
+  torus0.rotation.x += 1 * delta;
+  torus0.rotation.y += 0.4 * delta;
+  torus0.rotation.z += 2 * delta;
+};
 
-//add object to scene
-torus0.position.set(0, -(objDistance * 0 + headerDistance), 0);
-torus1.position.set(0, -(objDistance * 1 + headerDistance), 0);
-torus2.position.set(0, -(objDistance * 2 + headerDistance), 0);
-torus3.position.set(0, -(objDistance * 3 + headerDistance), 0);
-torus4.position.set(0, -(objDistance * 4 + headerDistance)+.2, 0);
-
-const torusGroup = new THREE.Group();
-torusGroup.add(torus0, torus1, torus2, torus3, torus4);
-scene.add(torusGroup);
-
-//pfp cube
+/**
+ * pfp cube
+ */
 const geometryCube = new THREE.BoxGeometry(10, 10, 10);
 const pfpTexture = new THREE.TextureLoader().load('/pfp.jpg');
 const geometryMesh = new THREE.MeshBasicMaterial({
@@ -99,19 +96,24 @@ pfpCube.position.x = 10;
 pfpCube.position.y = 10;
 //scene.add(pfpCube); 
 
-
-//helpers
+/**
+ * helpers
+ */
 const gridHelper = new THREE.GridHelper(500);
 //const controls = new OrbitControls(camera, renderer.domElement);
 scene.add(gridHelper);
 
-//scroll animation
+/**
+ * scroll animation
+ */
 let scrollY = window.scrollY;
 window.addEventListener('scroll', () => {
   scrollY = window.scrollY;
 });
 
-//cursor parallax
+/**
+ * cursor parallax
+ */
 const cursor = {
   x: 0,
   y: 0
@@ -119,10 +121,11 @@ const cursor = {
 window.addEventListener('mousemove', (event) => {
   cursor.x = event.clientX / window.innerWidth - 0.5; //range of -.5, 5
   cursor.y = event.clientY / window.innerHeight - 0.5; //range of -.5, 5
-  console.log(cursor);
 });
 
-//resize window 
+/**
+ * resize window
+ */
 window.addEventListener('resize', () => {
   windowSize.width = window.innerWidth;
   windowSize.height = window.innerHeight;
@@ -135,37 +138,30 @@ window.addEventListener('resize', () => {
   //renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 });
 
-//animate
-const clock = new THREE.Clock();
 
-const tick = () => {
-  requestAnimationFrame(tick);
+/**
+ * Animation
+ */
+const clock = new THREE.Clock;
+function tick(delta: number) {
+  for (const obj of updatables) {
+    //calls child tick method
+    obj.tick(delta);
+  }
+}
+renderer.setAnimationLoop(() => {
+  //delta for consistency
   const delta = clock.getDelta();
-
-  //controls.update();
-
-  //all background stars rotating
-  for (const star of starGroup.children) {
-    star.rotation.x += delta * 0.4; //use delta for consistent frame animation
-    star.rotation.y += delta * 0.3; 
-    star.rotation.z += delta * 1;
-  }
-  // animate torus 
-  for (const torus of torusGroup.children) {
-    torus.rotation.x += delta * 0.3;
-    torus.rotation.y += delta * 0.1;
-    torus.rotation.z += delta * 0.5;
-  }
-
+  tick(delta);
   //animate camera scroll
-  camera.position.y = -scrollY / windowSize.height * 8;
+  const SCROLL_SENS = 8
+  camera.position.y = -scrollY / windowSize.height * SCROLL_SENS;
 
   //animate cursor parallax
   const parallaxX = -cursor.x;
   const parallaxY = cursor.y;
-  cameraGroup.position.x += (parallaxX - cameraGroup.position.x) * delta * 30; //created camera group to get parallax and scroll working
-  cameraGroup.position.y += (parallaxY - cameraGroup.position.y) * delta * 10; //idk y it works xd
-
+  cameraGroup.position.x += (parallaxX - cameraGroup.position.x * delta * 30); //created camera group to get parallax and scroll working
+  cameraGroup.position.y += (parallaxY - cameraGroup.position.y * delta * 30); //idk y it works xd
   renderer.render(scene, camera);
-};
-tick();
+});
+
