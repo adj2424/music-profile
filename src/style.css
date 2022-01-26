@@ -6,20 +6,22 @@ canvas {
 
 :root {
   font-family: 'Cabin', sans-serif;
-  --primary-color: #192841;
+  --primary-color: #FFFFFF;
+}
+body {
+  overflow-x: hidden;
 }
 main {
   position: absolute;
-  
   width: 100%;
+  height: 500vh;
 }
 header {
-  display: flex;
+  
   align-items: center;
-  height: 130vh;
+  height: 50vh;
   position: relative;
   color: var(--primary-color);
-  text-transform: uppercase;
   font-size: 7vmin;
   padding-left: 10%;
   padding-right: 10%;
@@ -28,11 +30,16 @@ header {
 .section {
   display: flex;
   align-items: center;
-  height: 130vh;
+  height: 300vh;
   position: relative;
   color: var(--primary-color);
   text-transform: uppercase;
   font-size: 7vmin;
   padding-left: 10%;
   padding-right: 10%;
+}
+
+.detail {
+  display: flex;
+  align-items: center;
 }
