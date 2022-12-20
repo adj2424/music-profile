@@ -6,40 +6,79 @@ canvas {
 
 :root {
   font-family: 'Cabin', sans-serif;
-  --primary-color: #FFFFFF;
+  --header-size: 7vmin;
+  --detail-size: 4vmin;
+  --dark-color: #4056a1;
+  --light-color: #ffffff;
 }
+/**
+color themes #14
+https://visme.co/blog/website-color-schemes/
+*/
 body {
   overflow-x: hidden;
 }
+
 main {
   position: absolute;
   width: 100%;
-  height: 500vh;
 }
+
 header {
-  
+  text-transform: uppercase;
   align-items: center;
-  height: 50vh;
+  height: 190vh;
   position: relative;
-  color: var(--primary-color);
+  color: var(--dark-color);
   font-size: 7vmin;
   padding-left: 10%;
   padding-right: 10%;
+}
+
+.dark-background {
+  color: var(--light-color);
 }
 
 .section {
-  display: flex;
-  align-items: center;
-  height: 300vh;
   position: relative;
-  color: var(--primary-color);
+
   text-transform: uppercase;
   font-size: 7vmin;
-  padding-left: 10%;
-  padding-right: 10%;
+}
+
+.experience-detail {
+  height: 100vh;
+  position: relative;
+  text-transform: lowercase;
+  color: var(--primary-color);
+  padding-left: 20%;
+  padding-right: 50%;
+  font-size: 4vmin;
+}
+
+.listen-header {
+  position: relative;
+  transform-origin: 0 0;
+  transform: rotate(-90deg);
+  text-transform: uppercase;
+  font-size: 10vmin;
+  padding-top: 0.01%;
+  height: 150vh;
+}
+
+.listen-detail {
+  height: 50vh;
+  position: relative;
+  text-transform: lowercase;
+  color: var(--dark-color);
+  font-size: 4vmin;
+  padding-left: 50%;
+  padding-right: 20%;
 }
 
 .detail {
-  display: flex;
-  align-items: center;
+  height: 150vh;
+  position: relative;
+  text-transform: lowercase;
+  color: var(--primary-color);
 }
