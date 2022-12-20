@@ -17,7 +17,7 @@ const cameraGroup = new THREE.Group();
 scene.add(cameraGroup);
 
 const camera = new THREE.PerspectiveCamera(75, windowSize.width / windowSize.height, 0.1, 1000);
-// cameraGroup.add(camera);
+cameraGroup.add(camera);
 
 const renderer = new THREE.WebGLRenderer({
   canvas: document.querySelector('#bg')!,
@@ -210,8 +210,6 @@ window.addEventListener('mousemove', event => {
 let currScrollY = window.scrollY;
 const maxY = document.documentElement.scrollHeight - document.documentElement.clientHeight;
 let scrollPercent = 0.0;
-// const yy = 0;
-let deltaY = 0;
 window.addEventListener('scroll', () => {
   currScrollY = window.scrollY;
   scrollPercent = currScrollY / maxY;
@@ -219,10 +217,6 @@ window.addEventListener('scroll', () => {
   // scrollPercent = lerp(currScrollY, windowSize.height, 0.5);
 });
 
-window.addEventListener('wheel', event => {
-  deltaY = event.deltaY || event.deltaY * -1;
-  deltaY *= 0.5;
-});
 /**
  * scroll animation timeline
  */
@@ -294,11 +288,6 @@ function tick(delta: number) {
   }
 }
 
-let y = 0;
-// let p = 0;
-window.addEventListener('wheel', event => {
-  y = event.deltaY * 0.0007;
-});
 const SCROLL_SENS = 8;
 renderer.setAnimationLoop(() => {
   // delta for consistency
@@ -306,20 +295,15 @@ renderer.setAnimationLoop(() => {
   tick(delta);
 
   // animate camera scroll
-
-  //p += y;
-  y *= 0.9;
   camera.position.y = (-currScrollY / windowSize.height) * SCROLL_SENS;
-  // camera.position.y = -p * 4;
+
   // scroll based animation timeline
   playTimeLineAnimations();
 
   // animate cursor parallax
-  // const parallaxX = -cursor.x;
-  // const parallaxY = cursor.y;
-  // cameraGroup.position.x += (parallaxX - cameraGroup.position.x * delta * 30);
-  // created camera group to get parallax and scroll working;
-  // cameraGroup.position.y += (parallaxY - cameraGroup.position.y * delta * 30);
-  // idk y it works xd;
+  const parallaxX = -cursor.x;
+  const parallaxY = cursor.y;
+  cameraGroup.position.x += parallaxX - cameraGroup.position.x * delta * 30; // created camera group to get parallax and scroll working
+  cameraGroup.position.y += parallaxY - cameraGroup.position.y * delta * 30; // idk y it works xd
   renderer.render(scene, camera);
 });
