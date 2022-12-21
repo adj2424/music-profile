@@ -17,7 +17,7 @@ const cameraGroup = new THREE.Group();
 scene.add(cameraGroup);
 
 const camera = new THREE.PerspectiveCamera(75, windowSize.width / windowSize.height, 0.1, 1000);
-cameraGroup.add(camera);
+//cameraGroup.add(camera);
 
 const renderer = new THREE.WebGLRenderer({
   canvas: document.querySelector('#bg')!,
@@ -42,12 +42,12 @@ scene.background = new THREE.Color(0xefe2ba);
 // add background stars
 function genStars(num: number) {
   for (let i = 0; i < num; i++) {
-    const startGeometry = new THREE.TorusKnotGeometry(1, 0.1, 30, 10);
+    const starGeometry = new THREE.TorusKnotGeometry(1, 0.1, 30, 10);
     const starMaterial = new THREE.MeshBasicMaterial({
       wireframe: true,
       color: 0x0000ff
     });
-    const star = new THREE.Mesh(startGeometry, starMaterial);
+    const star = new THREE.Mesh(starGeometry, starMaterial);
     const x = Math.random() * (100 + 100) - 100;
     const y = -(Math.random() * (100 + 100));
     const z = -Math.random() * 100 + 5;
@@ -59,25 +59,25 @@ function genStars(num: number) {
     scene.add(star);
   }
 }
-/// genStars(100);
+//genStars(100);
 
 // add particles
 function genParticles(num: number) {
   for (let i = 0; i < num; i++) {
-    const particleGeometry = new THREE.SphereBufferGeometry(0.1, 8, 8);
+    const particleGeometry = new THREE.SphereGeometry(0.1, 8, 8);
     const particleMaterial = new THREE.MeshBasicMaterial({
       color: 0x000000,
       wireframe: true
     });
     const particle = new THREE.Mesh(particleGeometry, particleMaterial);
     const x = Math.random() * 120 - 60;
-    const y = -(Math.random() * 100) + 20;
-    const z = -Math.random() * 10 - 30;
+    const y = -(Math.random() * 10) - 20;
+    const z = -Math.random() * 10 - 10;
     particle.position.set(x, y, z);
     scene.add(particle);
   }
 }
-genParticles(20);
+genParticles(50);
 
 /**
  * Light Source
@@ -88,7 +88,7 @@ scene.add(ambientLight);
 /**
  * Torus
  */
-const torusGeometry = new THREE.TorusBufferGeometry(1, 0.5, 16, 100);
+const torusGeometry = new THREE.TorusGeometry(1, 0.5, 16, 100);
 const torusMaterial = new THREE.MeshToonMaterial({
   color: 0xff0000,
   wireframe: true
@@ -106,7 +106,7 @@ scene.add(torus0);
 /**
  * TorusKnot
  */
-const torusKnotGeometry = new THREE.TorusKnotBufferGeometry(0.4, 0.05, 100, 20);
+const torusKnotGeometry = new THREE.TorusKnotGeometry(0.4, 0.05, 100, 20);
 const torusKnotMesh = new THREE.MeshToonMaterial({
   color: 0x00000ff,
   wireframe: true
@@ -132,43 +132,61 @@ updatables.push(torusKnotGroup);
   }
   torusKnotGroup.position.x -= 2 * delta;
 };
-/**
- * Dark background plane
- */
-const planeGeometry = new THREE.PlaneBufferGeometry(25, 40);
-const planeMaterial = new THREE.MeshBasicMaterial({
-  color: 0x4056a1
-});
-const darkPlane = new THREE.Mesh(planeGeometry, planeMaterial);
-darkPlane.position.set(0, -28, -3);
-scene.add(darkPlane);
-/**
- * Light background plane
- */
-const lightPlane = new THREE.Mesh(
-  new THREE.PlaneBufferGeometry(24, 26),
-  new THREE.MeshBasicMaterial({
-    color: 0xc5cbe3
-  })
-);
-lightPlane.position.set(2, -22, -4);
-scene.add(lightPlane);
 
 /**
- * Cone
+ * rotating stuff
  */
-const coneGeometry = new THREE.ConeBufferGeometry(1, 3, 15);
-const coneMaterial = new THREE.MeshBasicMaterial({
-  color: 0xffff33,
+const cylinderGeometry = new THREE.CylinderGeometry(1, 1, 3, 10);
+const material = new THREE.MeshBasicMaterial({
+  color: 0x0000ff,
   wireframe: true
 });
-const cone = new THREE.Mesh(coneGeometry, coneMaterial);
-cone.position.set(5, -16, -2);
-(cone as any).tick = (delta: number) => {
-  cone.rotation.y += delta * 1;
+const cylinder = new THREE.Mesh(cylinderGeometry, material);
+cylinder.position.set(0, -20, -5);
+
+(cylinder as any).tick = (delta: number) => {
+  cylinder.rotateOnAxis(new THREE.Vector3(0, 1, 0), delta * 0.5);
+  //cylinder.rotation.y += delta * 0.5;
 };
-updatables.push(cone);
-scene.add(cone);
+
+cylinder.rotation.z = -Math.PI / 10;
+updatables.push(cylinder);
+scene.add(cylinder);
+
+const startGeometry = new THREE.TorusKnotGeometry(0.5, 0.1, 30, 10);
+const starMaterial = new THREE.MeshBasicMaterial({
+  wireframe: true,
+  color: 0x0000ff
+});
+
+let r = 11;
+let amount = 5;
+for (let i = 0; i < amount; i++) {
+  let x = (i * 2 * r) / amount - r;
+  const star = new THREE.Mesh(startGeometry, starMaterial);
+  star.position.x = x;
+  let y = Math.sqrt(Math.pow(r, 2) - Math.pow(x, 2));
+  star.position.z = y;
+  cylinder.add(star);
+}
+
+for (let i = 0; i < amount; i++) {
+  let x = (i * 2 * r) / amount - r;
+  const star = new THREE.Mesh(startGeometry, starMaterial);
+  star.position.x = x;
+  let y = -Math.sqrt(Math.pow(r, 2) - Math.pow(x, 2));
+  star.position.z = y;
+  cylinder.add(star);
+}
+
+const star = new THREE.Mesh(startGeometry, starMaterial);
+const star2 = new THREE.Mesh(startGeometry, starMaterial);
+
+//cylinder.add(star);
+//cylinder.add(star2);
+
+star.position.x = 4;
+star2.position.z = 4;
 
 /**
  * helpers
@@ -245,6 +263,7 @@ const torusScript = {
 };
 timeLineScripts.push(torusScript);
 
+/*
 const movePlaneScript = {
   start: 0.25,
   end: 0.35,
@@ -268,6 +287,7 @@ const movePlanes = {
   }
 };
 timeLineScripts.push(movePlanes);
+*/
 
 function playTimeLineAnimations() {
   for (const script of timeLineScripts) {
