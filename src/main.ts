@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import './style.css';
 import * as THREE from 'three';
+import { gsap } from 'gsap';
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 // import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 /**
@@ -71,13 +74,13 @@ function genParticles(num: number) {
     });
     const particle = new THREE.Mesh(particleGeometry, particleMaterial);
     const x = Math.random() * 120 - 60;
-    const y = -(Math.random() * 10) - 20;
-    const z = -Math.random() * 10 - 10;
+    const y = -(Math.random() * 15) - 12;
+    const z = -Math.random() * 7 - 5;
     particle.position.set(x, y, z);
     scene.add(particle);
   }
 }
-genParticles(50);
+genParticles(80);
 
 /**
  * Light Source
@@ -142,13 +145,13 @@ const material = new THREE.MeshBasicMaterial({
   wireframe: true
 });
 const cylinder = new THREE.Mesh(cylinderGeometry, material);
-cylinder.position.set(0, -20, -5);
+cylinder.position.set(0, -35, -14);
 
 (cylinder as any).tick = (delta: number) => {
   cylinder.rotateOnAxis(new THREE.Vector3(0, 1, 0), delta * 0.5);
   //cylinder.rotation.y += delta * 0.5;
 };
-
+cylinder.rotation.x = -Math.PI / 8;
 cylinder.rotation.z = -Math.PI / 10;
 updatables.push(cylinder);
 scene.add(cylinder);
@@ -160,7 +163,7 @@ const starMaterial = new THREE.MeshBasicMaterial({
 });
 
 let r = 11;
-let amount = 5;
+let amount = 6;
 for (let i = 0; i < amount; i++) {
   let x = (i * 2 * r) / amount - r;
   const star = new THREE.Mesh(startGeometry, starMaterial);
@@ -179,15 +182,27 @@ for (let i = 0; i < amount; i++) {
   cylinder.add(star);
 }
 
-const star = new THREE.Mesh(startGeometry, starMaterial);
-const star2 = new THREE.Mesh(startGeometry, starMaterial);
-
-//cylinder.add(star);
-//cylinder.add(star2);
-
-star.position.x = 4;
-star2.position.z = 4;
-
+const loader = new FontLoader();
+loader.load('/Hanken_Grotesk_Regular.json', font => {
+  const geometry = new TextGeometry('Hello Three.js!', {
+    font: font,
+    size: 2,
+    height: 0.1
+  });
+  const font1 = new THREE.Mesh(
+    geometry,
+    new THREE.MeshBasicMaterial({
+      color: 0xffffff
+    })
+  );
+  font1.position.set(-10, -35, -15);
+  scene.add(font1);
+  //updatables.push(fontMesh);
+  (font1 as any).tick = (delta: number) => {
+    font1.rotation.x += 0.5 * delta;
+  };
+  font1.rotation.x = -Math.PI / 4;
+});
 /**
  * helpers
  */
@@ -201,10 +216,8 @@ scene.add(gridHelper);
 window.addEventListener('resize', () => {
   windowSize.width = window.innerWidth;
   windowSize.height = window.innerHeight;
-
   camera.aspect = windowSize.width / windowSize.height;
   camera.updateProjectionMatrix();
-
   renderer.setSize(windowSize.width, windowSize.height);
   renderer.setPixelRatio(window.devicePixelRatio);
   // renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -257,37 +270,67 @@ const torusScript = {
   start: 0.0,
   end: 0.1,
   animationFun: () => {
+    // animate camera scroll
+    camera.position.y = lerp(0, -9, scalePercent(torusScript.start, torusScript.end));
     torus0.position.x = lerp(3, -10, scalePercent(torusScript.start, torusScript.end));
     torus0.position.y = lerp(1, -5, scalePercent(torusScript.start, torusScript.end));
   }
 };
 timeLineScripts.push(torusScript);
 
-/*
-const movePlaneScript = {
-  start: 0.25,
-  end: 0.35,
+const moveCameraScript = {
+  start: 0.1,
+  end: 0.2,
   animationFun: () => {
-    darkPlane.position.x = lerp(0, -19, scalePercent(0.25, 0.35));
-    // console.log([darkPlane.position.x, scrollPercent, lerp(0, -19, scalePercent(0.250, 0.35))])
-    // darkPlane.position.x = -scrollPercent * 100 + 25;
+    camera.position.y = lerp(-9, -12, scalePercent(moveCameraScript.start, 0.115));
+    camera.position.z = lerp(5, -8, scalePercent(moveCameraScript.start, moveCameraScript.end));
+    camera.rotation.x = lerp(0, -Math.PI / 4, scalePercent(moveCameraScript.start, moveCameraScript.end));
   }
 };
-timeLineScripts.push(movePlaneScript);
+timeLineScripts.push(moveCameraScript);
 
-const movePlanes = {
-  start: 0.45,
-  end: 0.6,
+const changeBackgroundScript = {
+  start: 0.2,
+  end: 0.5,
   animationFun: () => {
-    lightPlane.position.x = lerp(2, 40, scalePercent(movePlanes.start, movePlanes.end));
-    lightPlane.position.y = lerp(-23, -10, scalePercent(movePlanes.start, movePlanes.end));
-    // camera.position.x = lerp(18, 0, scalePercent(movePlaneCameraScript.start,
-    // movePlaneCameraScript.end, scrollPercent));
-    darkPlane.position.x = lerp(-19, -30, scalePercent(movePlanes.start, movePlanes.end));
+    if (scrollPercent > 0.4) {
+      gsap.to(scene.background, {
+        duration: 2,
+        r: 1,
+        g: 0,
+        b: 1
+      });
+    }
+    //
+    else if (scrollPercent > 0.3) {
+      gsap.to(scene.background, {
+        duration: 2,
+        r: 0,
+        g: 1,
+        b: 1
+      });
+    }
+    //
+    else if (scrollPercent > 0.22) {
+      gsap.to(scene.background, {
+        duration: 2,
+        r: 0,
+        g: 1,
+        b: 0
+      });
+    }
+    //
+    else {
+      gsap.to(scene.background, {
+        duration: 2,
+        r: 239 / 255,
+        g: 226 / 255,
+        b: 186 / 255
+      });
+    }
   }
 };
-timeLineScripts.push(movePlanes);
-*/
+timeLineScripts.push(changeBackgroundScript);
 
 function playTimeLineAnimations() {
   for (const script of timeLineScripts) {
@@ -308,19 +351,18 @@ function tick(delta: number) {
   }
 }
 
-const SCROLL_SENS = 8;
 renderer.setAnimationLoop(() => {
   // delta for consistency
   const delta = clock.getDelta();
   tick(delta);
 
   // animate camera scroll
-  camera.position.y = (-currScrollY / windowSize.height) * SCROLL_SENS;
+  //camera.position.y = (-currScrollY / windowSize.height) * SCROLL_SENS;
 
-  // scroll based animation timeline
+  // scroll based animation timeline - https://sbcode.net/threejs/animate-on-scroll/
   playTimeLineAnimations();
 
-  // animate cursor parallax
+  // animate cursor parallax - https://tympanus.net/codrops/2022/01/05/crafting-scroll-based-animations-in-three-js/
   const parallaxX = -cursor.x;
   const parallaxY = cursor.y;
   cameraGroup.position.x += parallaxX - cameraGroup.position.x * delta * 30; // created camera group to get parallax and scroll working
