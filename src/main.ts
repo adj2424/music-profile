@@ -2,9 +2,10 @@
 import './style.css';
 import * as THREE from 'three';
 import { gsap } from 'gsap';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
-// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 /**
  * Set up
@@ -89,22 +90,48 @@ const ambientLight = new THREE.AmbientLight(0xffffff);
 scene.add(ambientLight);
 
 /**
- * Torus
+ * Header Title
  */
-const torusGeometry = new THREE.TorusGeometry(1, 0.5, 16, 100);
-const torusMaterial = new THREE.MeshToonMaterial({
-  color: 0xff0000,
-  wireframe: true
+/**
+ * Trumpet
+ */
+const gltfLoader = new GLTFLoader();
+let trumpet = new THREE.Group();
+gltfLoader.load('/trumpet/scene.gltf', gltf => {
+  trumpet = gltf.scene;
+  scene.add(trumpet);
+  trumpet.position.set(-8, 16, -23);
+  trumpet.rotateX(-0.2);
+  trumpet.rotation.y = -(3 * Math.PI) / 4 + 0.3;
 });
-const torus0 = new THREE.Mesh(torusGeometry, torusMaterial);
-torus0.position.set(3, 1, 0);
-updatables.push(torus0);
-scene.add(torus0);
-(torus0 as any).tick = (delta: number) => {
-  torus0.rotation.x += 1 * delta;
-  torus0.rotation.y += 0.4 * delta;
-  torus0.rotation.z += 2 * delta;
+//const trumpetURL = new URL('../public/trumpet.glb', import.meta.url);
+
+/**
+ * Text
+ */
+const fontLoader = new FontLoader();
+let nameText = new THREE.Mesh();
+const createTitleText = async () => {
+  const font = await fontLoader.loadAsync('/Hanken_Grotesk_Regular.json');
+  const textGeometry = new TextGeometry('ALAN JIANG', {
+    font: font,
+    size: 11,
+    height: 1
+  });
+  nameText = new THREE.Mesh(
+    textGeometry,
+    new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      wireframe: true
+    })
+  );
+  nameText.rotateOnAxis(new THREE.Vector3(0, 1, 0), (7 * Math.PI) / 4 + 0.6);
+  nameText.position.set(-50, -3, -33);
+  nameText.rotateX(-0.15);
+  nameText.rotateZ(0.09);
+  scene.add(nameText);
 };
+createTitleText();
 
 /**
  * TorusKnot
@@ -139,7 +166,7 @@ updatables.push(torusKnotGroup);
 /**
  * rotating stuff
  */
-const cylinderGeometry = new THREE.CylinderGeometry(1, 1, 3, 10);
+let cylinderGeometry = new THREE.CylinderGeometry(1, 1, 3, 10);
 const material = new THREE.MeshBasicMaterial({
   color: 0x0000ff,
   wireframe: true
@@ -148,6 +175,8 @@ const cylinder = new THREE.Mesh(cylinderGeometry, material);
 cylinder.position.set(0, -35, -14);
 
 (cylinder as any).tick = (delta: number) => {
+  //console.log(cylinderGeometry.attributes.position.count);
+  //console.log(cylinderGeometry.vertices);
   cylinder.rotateOnAxis(new THREE.Vector3(0, 1, 0), delta * 0.5);
   //cylinder.rotation.y += delta * 0.5;
 };
@@ -182,32 +211,76 @@ for (let i = 0; i < amount; i++) {
   cylinder.add(star);
 }
 
-const loader = new FontLoader();
-loader.load('/Hanken_Grotesk_Regular.json', font => {
-  const geometry = new TextGeometry('Hello Three.js!', {
-    font: font,
-    size: 2,
-    height: 0.1
+// const twist = (geometry1: any) => {
+//   const quaternion = new THREE.Quaternion();
+//   const geometry = new THREE.CylinderGeometry(1, 1, 3, 10);
+//   console.log(geometry.attributes.position.count);
+//   for (let i = 0; i < geometry.attributes.position.count; i++) {
+//     // a single vertex Y position
+//     const yPos = geometry.attributes.position.getY(i);
+//     const twistAmount = 10;
+//     const upVec = new THREE.Vector3(0, 1, 0);
+//     quaternion.setFromAxisAngle(upVec, (Math.PI / 180) * (yPos / twistAmount));
+//     const twistVec = new THREE.Vector3(
+//       geometry.attributes.position.getX(i),
+//       geometry.attributes.position.getY(i),
+//       geometry.attributes.position.getZ(i)
+//     );
+//     //geometry.attributes.position.array[i].applyQuaternion(quaternion);
+//     //geometry.vertices[i].applyQuaternion(quaternion);
+//     twistVec.applyQuaternion(quaternion);
+//   }
+
+//   // tells Three.js to re-render this mesh
+//   geometry.attributes.position.needsUpdate = true;
+// };
+
+//const fontLoader = new FontLoader();
+//let text = new THREE.Mesh();
+const textGroup = new THREE.Group();
+textGroup.position.set(0, 0, 0);
+const createText = async (words: string[]) => {
+  const font = await fontLoader.loadAsync('/Hanken_Grotesk_Regular.json');
+  words.map((e, i) => {
+    const textGeometry = new TextGeometry(e, {
+      font: font,
+      size: 2,
+      height: 0.1
+    });
+    const text = new THREE.Mesh(
+      textGeometry,
+      new THREE.MeshBasicMaterial({
+        color: 0xffffff
+      })
+    );
+    //text.position.set(-10 + i, -35, -15);
+    text.position.set(-1 + 30 * i, -16, -36);
+    //scene.add(text);
+    textGroup.add(text);
   });
-  const font1 = new THREE.Mesh(
-    geometry,
-    new THREE.MeshBasicMaterial({
-      color: 0xffffff
-    })
-  );
-  font1.position.set(-10, -35, -15);
-  scene.add(font1);
-  //updatables.push(fontMesh);
-  (font1 as any).tick = (delta: number) => {
-    font1.rotation.x += 0.5 * delta;
-  };
-  font1.rotation.x = -Math.PI / 4;
-});
+  scene.add(textGroup);
+};
+createText([
+  'Scheherazade',
+  'Festive Overture',
+  'Haydn Concerto',
+  'Neruda Concerto',
+  'Petrushka',
+  'Yoru ni Kakeru',
+  'O Magnum Mysterium'
+]);
+
+//updatables.push(textGroup);
+(textGroup as any).tick = (delta: number) => {
+  textGroup.rotation.x += 0.5 * delta;
+};
+textGroup.rotation.x = -Math.PI / 4;
+
 /**
  * helpers
  */
 const gridHelper = new THREE.GridHelper(500);
-// const controls = new OrbitControls(camera, renderer.domElement);
+const controls = new OrbitControls(camera, renderer.domElement);
 scene.add(gridHelper);
 
 /**
@@ -266,34 +339,52 @@ const timeLineScripts: {
   animationFun: () => void;
 }[] = [];
 
-const torusScript = {
-  start: 0.0,
-  end: 0.1,
+const changeTitleScript = {
+  start: 0.01,
+  end: 0.075,
   animationFun: () => {
     // animate camera scroll
-    camera.position.y = lerp(0, -9, scalePercent(torusScript.start, torusScript.end));
-    torus0.position.x = lerp(3, -10, scalePercent(torusScript.start, torusScript.end));
-    torus0.position.y = lerp(1, -5, scalePercent(torusScript.start, torusScript.end));
+    nameText.position.x = lerp(-50, 100, scalePercent(changeTitleScript.start, changeTitleScript.end));
+    nameText.position.y = lerp(-3, 10, scalePercent(changeTitleScript.start, changeTitleScript.end));
+    nameText.position.z = lerp(-33, 0, scalePercent(changeTitleScript.start, changeTitleScript.end));
+    trumpet.rotation.y = lerp(
+      -(3 * Math.PI) / 4 + 0.3,
+      (3 * Math.PI) / 4 - 0.2,
+      scalePercent(changeTitleScript.start, changeTitleScript.end)
+    );
+    trumpet.position.x = lerp(-8, 8, scalePercent(changeTitleScript.start, changeTitleScript.end));
+    trumpet.position.z = lerp(-23, -30, scalePercent(changeTitleScript.start, changeTitleScript.end));
+
+    //camera.position.y = lerp(0, -9, scalePercent(changeTitleScript.start, changeTitleScript.end));
   }
 };
-timeLineScripts.push(torusScript);
+timeLineScripts.push(changeTitleScript);
 
 const moveCameraScript = {
   start: 0.1,
   end: 0.2,
   animationFun: () => {
-    camera.position.y = lerp(-9, -12, scalePercent(moveCameraScript.start, 0.115));
+    camera.position.y = lerp(0, -12, scalePercent(moveCameraScript.start, moveCameraScript.end));
     camera.position.z = lerp(5, -8, scalePercent(moveCameraScript.start, moveCameraScript.end));
     camera.rotation.x = lerp(0, -Math.PI / 4, scalePercent(moveCameraScript.start, moveCameraScript.end));
   }
 };
 timeLineScripts.push(moveCameraScript);
 
+const moveTextScript = {
+  start: 0.25,
+  end: 0.7,
+  animationFun: () => {
+    textGroup.position.x = lerp(0, -193.5, scalePercent(moveTextScript.start, moveTextScript.end));
+  }
+};
+timeLineScripts.push(moveTextScript);
+
 const changeBackgroundScript = {
   start: 0.2,
   end: 0.5,
   animationFun: () => {
-    if (scrollPercent > 0.4) {
+    if (scrollPercent > 0.48) {
       gsap.to(scene.background, {
         duration: 2,
         r: 1,
@@ -302,7 +393,7 @@ const changeBackgroundScript = {
       });
     }
     //
-    else if (scrollPercent > 0.3) {
+    else if (scrollPercent > 0.35) {
       gsap.to(scene.background, {
         duration: 2,
         r: 0,
@@ -351,21 +442,24 @@ function tick(delta: number) {
   }
 }
 
+//controls.update();
 renderer.setAnimationLoop(() => {
   // delta for consistency
   const delta = clock.getDelta();
   tick(delta);
-
+  //controls.update();
   // animate camera scroll
   //camera.position.y = (-currScrollY / windowSize.height) * SCROLL_SENS;
 
+  // another way looks correct but harder - https://tympanus.net/codrops/2022/12/13/how-to-code-an-on-scroll-folding-3d-cardboard-box-animation-with-three-js-and-gsap/
   // scroll based animation timeline - https://sbcode.net/threejs/animate-on-scroll/
   playTimeLineAnimations();
 
   // animate cursor parallax - https://tympanus.net/codrops/2022/01/05/crafting-scroll-based-animations-in-three-js/
+  const PARALLAX_SENSE = 100;
   const parallaxX = -cursor.x;
   const parallaxY = cursor.y;
-  cameraGroup.position.x += parallaxX - cameraGroup.position.x * delta * 30; // created camera group to get parallax and scroll working
-  cameraGroup.position.y += parallaxY - cameraGroup.position.y * delta * 30; // idk y it works xd
+  cameraGroup.position.x += parallaxX - cameraGroup.position.x * delta * PARALLAX_SENSE; // created camera group to get parallax and scroll working
+  cameraGroup.position.y += parallaxY - cameraGroup.position.y * delta * PARALLAX_SENSE; // idk y it works xd
   renderer.render(scene, camera);
 });

@@ -22,17 +22,14 @@ body {
 main {
   position: absolute;
   width: 100%;
-}
-
-header {
-  text-transform: uppercase;
   align-items: center;
-  height: 190vh;
+  height: 2000vh;
   position: relative;
   color: var(--dark-color);
-  font-size: 7vmin;
-  padding-left: 10%;
-  padding-right: 10%;
+}
+
+/**
+header {
 }
 
 .dark-background {
@@ -86,3 +83,4 @@ header {
   text-transform: lowercase;
   color: var(--primary-color);
 }
+*/

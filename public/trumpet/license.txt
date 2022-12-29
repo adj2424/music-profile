@@ -1,0 +1,11 @@
+Model Information:
+* title:	Trumpet
+* source:	https://sketchfab.com/3d-models/trumpet-b6c071c44fc24f25a50dab2a4a14218a
+* author:	WEManey (https://sketchfab.com/findingomen)
+
+Model License:
+* license type:	CC-BY-NC-SA-4.0 (http://creativecommons.org/licenses/by-nc-sa/4.0/)
+* requirements:	Author must be credited. No commercial use. Modified versions must have the same license.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Trumpet" (https://sketchfab.com/3d-models/trumpet-b6c071c44fc24f25a50dab2a4a14218a) by WEManey (https://sketchfab.com/findingomen) licensed under CC-BY-NC-SA-4.0 (http://creativecommons.org/licenses/by-nc-sa/4.0/)
