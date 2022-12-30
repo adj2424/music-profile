@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import './style.css';
 import * as THREE from 'three';
 import { gsap } from 'gsap';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+//import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 /**
  * Set up
@@ -44,25 +43,25 @@ renderer.render(scene, camera);
 scene.background = new THREE.Color(0xefe2ba);
 
 // add background stars
-function genStars(num: number) {
-  for (let i = 0; i < num; i++) {
-    const starGeometry = new THREE.TorusKnotGeometry(1, 0.1, 30, 10);
-    const starMaterial = new THREE.MeshBasicMaterial({
-      wireframe: true,
-      color: 0x0000ff
-    });
-    const star = new THREE.Mesh(starGeometry, starMaterial);
-    const x = Math.random() * (100 + 100) - 100;
-    const y = -(Math.random() * (100 + 100));
-    const z = -Math.random() * 100 + 5;
-    star.position.set(x, y, z);
-    updatables.push(star);
-    (star as any).tick = (delta: number) => {
-      star.rotation.x += 1 * delta;
-    };
-    scene.add(star);
-  }
-}
+// function genStars(num: number) {
+//   for (let i = 0; i < num; i++) {
+//     const starGeometry = new THREE.TorusKnotGeometry(1, 0.1, 30, 10);
+//     const starMaterial = new THREE.MeshBasicMaterial({
+//       wireframe: true,
+//       color: 0x0000ff
+//     });
+//     const star = new THREE.Mesh(starGeometry, starMaterial);
+//     const x = Math.random() * (100 + 100) - 100;
+//     const y = -(Math.random() * (100 + 100));
+//     const z = -Math.random() * 100 + 5;
+//     star.position.set(x, y, z);
+//     updatables.push(star);
+//     (star as any).tick = (delta: number) => {
+//       star.rotation.x += 1 * delta;
+//     };
+//     scene.add(star);
+//   }
+// }
 //genStars(100);
 
 // add particles
@@ -280,7 +279,7 @@ textGroup.rotation.x = -Math.PI / 4;
  * helpers
  */
 const gridHelper = new THREE.GridHelper(500);
-const controls = new OrbitControls(camera, renderer.domElement);
+//const controls = new OrbitControls(camera, renderer.domElement);
 scene.add(gridHelper);
 
 /**
@@ -451,7 +450,7 @@ renderer.setAnimationLoop(() => {
   // animate camera scroll
   //camera.position.y = (-currScrollY / windowSize.height) * SCROLL_SENS;
 
-  // another way looks correct but harder - https://tympanus.net/codrops/2022/12/13/how-to-code-an-on-scroll-folding-3d-cardboard-box-animation-with-three-js-and-gsap/
+  // another way looks better but sus - https://tympanus.net/codrops/2022/12/13/how-to-code-an-on-scroll-folding-3d-cardboard-box-animation-with-three-js-and-gsap/
   // scroll based animation timeline - https://sbcode.net/threejs/animate-on-scroll/
   playTimeLineAnimations();
 
