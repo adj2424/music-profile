@@ -21,11 +21,16 @@ body {
 
 main {
   position: absolute;
-  width: 100%;
+
   align-items: center;
-  height: 2000vh;
+
   position: relative;
   color: var(--dark-color);
+}
+
+.page {
+  width: 100%;
+  height: 1000vh;
 }
 
 /**

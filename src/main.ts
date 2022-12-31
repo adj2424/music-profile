@@ -1,10 +1,11 @@
 import './style.css';
 import * as THREE from 'three';
 import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/all';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
-//import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 /**
  * Set up
@@ -43,25 +44,25 @@ renderer.render(scene, camera);
 scene.background = new THREE.Color(0xefe2ba);
 
 // add background stars
-// function genStars(num: number) {
-//   for (let i = 0; i < num; i++) {
-//     const starGeometry = new THREE.TorusKnotGeometry(1, 0.1, 30, 10);
-//     const starMaterial = new THREE.MeshBasicMaterial({
-//       wireframe: true,
-//       color: 0x0000ff
-//     });
-//     const star = new THREE.Mesh(starGeometry, starMaterial);
-//     const x = Math.random() * (100 + 100) - 100;
-//     const y = -(Math.random() * (100 + 100));
-//     const z = -Math.random() * 100 + 5;
-//     star.position.set(x, y, z);
-//     updatables.push(star);
-//     (star as any).tick = (delta: number) => {
-//       star.rotation.x += 1 * delta;
-//     };
-//     scene.add(star);
-//   }
-// }
+function genStars(num: number) {
+  for (let i = 0; i < num; i++) {
+    const starGeometry = new THREE.TorusKnotGeometry(1, 0.1, 30, 10);
+    const starMaterial = new THREE.MeshBasicMaterial({
+      wireframe: true,
+      color: 0x0000ff
+    });
+    const star = new THREE.Mesh(starGeometry, starMaterial);
+    const x = Math.random() * (100 + 100) - 100;
+    const y = -(Math.random() * (100 + 100));
+    const z = -Math.random() * 100 + 5;
+    star.position.set(x, y, z);
+    updatables.push(star);
+    (star as any).tick = (delta: number) => {
+      star.rotation.x += 1 * delta;
+    };
+    scene.add(star);
+  }
+}
 //genStars(100);
 
 // add particles
@@ -210,29 +211,7 @@ for (let i = 0; i < amount; i++) {
   cylinder.add(star);
 }
 
-// const twist = (geometry1: any) => {
-//   const quaternion = new THREE.Quaternion();
-//   const geometry = new THREE.CylinderGeometry(1, 1, 3, 10);
-//   console.log(geometry.attributes.position.count);
-//   for (let i = 0; i < geometry.attributes.position.count; i++) {
-//     // a single vertex Y position
-//     const yPos = geometry.attributes.position.getY(i);
-//     const twistAmount = 10;
-//     const upVec = new THREE.Vector3(0, 1, 0);
-//     quaternion.setFromAxisAngle(upVec, (Math.PI / 180) * (yPos / twistAmount));
-//     const twistVec = new THREE.Vector3(
-//       geometry.attributes.position.getX(i),
-//       geometry.attributes.position.getY(i),
-//       geometry.attributes.position.getZ(i)
-//     );
-//     //geometry.attributes.position.array[i].applyQuaternion(quaternion);
-//     //geometry.vertices[i].applyQuaternion(quaternion);
-//     twistVec.applyQuaternion(quaternion);
-//   }
-
-//   // tells Three.js to re-render this mesh
-//   geometry.attributes.position.needsUpdate = true;
-// };
+// twist deprecated - https://medium.com/@crazypixel/geometry-manipulation-in-three-js-twisting-c53782c38bb
 
 //const fontLoader = new FontLoader();
 //let text = new THREE.Mesh();
@@ -308,7 +287,7 @@ window.addEventListener('mousemove', event => {
 });
 
 /**
- * scroll animation
+ * current scroll percentage
  */
 let currScrollY = window.scrollY;
 const maxY = document.documentElement.scrollHeight - document.documentElement.clientHeight;
@@ -316,13 +295,8 @@ let scrollPercent = 0.0;
 window.addEventListener('scroll', () => {
   currScrollY = window.scrollY;
   scrollPercent = currScrollY / maxY;
-  // console.log(scrollPercent);
-  // scrollPercent = lerp(currScrollY, windowSize.height, 0.5);
 });
 
-/**
- * scroll animation timeline
- */
 // linear interpolation function
 function lerp(min: number, max: number, ratio: number): number {
   return (1 - ratio) * min + ratio * max;
@@ -430,9 +404,7 @@ function playTimeLineAnimations() {
   }
 }
 
-/**
- * animation
- */
+//animates objects with animations
 const clock = new THREE.Clock();
 function tick(delta: number) {
   for (const obj of updatables) {
@@ -441,19 +413,23 @@ function tick(delta: number) {
   }
 }
 
+let nameTextParam = { x: -50, y: -3, z: -33 };
+let trumpetParam = { yRotation: -(3 * Math.PI) / 4 + 0.3, xPosition: -8, zPosition: -23 };
 //controls.update();
-renderer.setAnimationLoop(() => {
+/**
+ * animation
+ */
+const animate = () => {
   // delta for consistency
   const delta = clock.getDelta();
   tick(delta);
-  //controls.update();
-  // animate camera scroll
-  //camera.position.y = (-currScrollY / windowSize.height) * SCROLL_SENS;
 
-  // another way looks better but sus - https://tympanus.net/codrops/2022/12/13/how-to-code-an-on-scroll-folding-3d-cardboard-box-animation-with-three-js-and-gsap/
-  // scroll based animation timeline - https://sbcode.net/threejs/animate-on-scroll/
-  playTimeLineAnimations();
+  nameText.position.set(nameTextParam.x, nameTextParam.y, nameTextParam.z);
+  trumpet.rotation.y = trumpetParam.yRotation;
+  trumpet.position.set(trumpetParam.xPosition, 16, trumpetParam.zPosition);
 
+  // scroll based animation timeline noob strat - https://sbcode.net/threejs/animate-on-scroll/
+  // playTimeLineAnimations();
   // animate cursor parallax - https://tympanus.net/codrops/2022/01/05/crafting-scroll-based-animations-in-three-js/
   const PARALLAX_SENSE = 100;
   const parallaxX = -cursor.x;
@@ -461,4 +437,86 @@ renderer.setAnimationLoop(() => {
   cameraGroup.position.x += parallaxX - cameraGroup.position.x * delta * PARALLAX_SENSE; // created camera group to get parallax and scroll working
   cameraGroup.position.y += parallaxY - cameraGroup.position.y * delta * PARALLAX_SENSE; // idk y it works xd
   renderer.render(scene, camera);
+};
+renderer.setAnimationLoop(animate);
+
+/**
+ * scroll animation by current scroll position
+ */
+let scrollUp = true;
+let lastScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+let position = 0;
+window.addEventListener('scroll', () => {
+  let st = window.pageYOffset || document.documentElement.scrollTop;
+  // down scroll code
+  if (st > lastScrollTop) {
+    scrollUp = false;
+  }
+  // up scroll code
+  else {
+    scrollUp = true;
+  }
+  lastScrollTop = st <= 0 ? 0 : st;
+
+  if (scrollPercent > 0.05 && scrollPercent < 0.1 && position == 0 && !scrollUp) {
+    position = 1;
+    gsap.to(trumpetParam, {
+      duration: 1,
+      yRotation: (3 * Math.PI) / 4 - 0.2,
+      xPosition: 8,
+      zPosition: -30,
+      ease: 'power1.out'
+    });
+  }
+  if (scrollPercent < 0.05 && scrollUp && position == 1) {
+    position = 0;
+    gsap.to(trumpetParam, {
+      duration: 1,
+      yRotation: -(3 * Math.PI) / 4 + 0.3,
+      xPosition: -8,
+      zPosition: -23,
+      ease: 'power1.out'
+    });
+  }
 });
+
+/**
+ * https://tympanus.net/codrops/2022/12/13/how-to-code-an-on-scroll-folding-3d-cardboard-box-animation-with-three-js-and-gsap/
+ * scroll animation timeline by scrolling
+ */
+gsap.registerPlugin(ScrollTrigger);
+const timeline = gsap.timeline({
+  scrollTrigger: {
+    trigger: '.page',
+    start: '0% 0%',
+    end: '100% 100%',
+    scrub: true,
+    markers: true,
+    onUpdate: animate
+  }
+});
+timeline
+  .to(
+    nameTextParam,
+    {
+      duration: 20, // duration
+      x: 50,
+      y: 5,
+      z: -5,
+      ease: 'power1.out'
+    },
+    0 // start time
+  )
+  .to(
+    nameTextParam,
+    {
+      duration: 20,
+      x: -50,
+      y: -3,
+      z: -33,
+      ease: 'power1.out'
+    },
+    20
+  )
+  // to make start time a percentage out of 100 from total duration
+  .to(nameTextParam, {}, 100);
