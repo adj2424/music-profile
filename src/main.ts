@@ -39,9 +39,10 @@ renderer.render(scene, camera);
 /**
  * Background
  */
-// const background = new THREE.TextureLoader().load('/background.jpg');
-// scene.background = background;
-scene.background = new THREE.Color(0xefe2ba);
+//const background = new THREE.TextureLoader().load('/background.jpg');
+//scene.background = background;
+//scene.background = new THREE.Color(0xefe2ba);
+scene.background = new THREE.Color(0x0000ff);
 
 // add background stars
 function genStars(num: number) {
@@ -70,13 +71,13 @@ function genParticles(num: number) {
   for (let i = 0; i < num; i++) {
     const particleGeometry = new THREE.SphereGeometry(0.1, 8, 8);
     const particleMaterial = new THREE.MeshBasicMaterial({
-      color: 0x000000,
+      color: 0x0000ff,
       wireframe: true
     });
     const particle = new THREE.Mesh(particleGeometry, particleMaterial);
-    const x = Math.random() * 120 - 60;
-    const y = -(Math.random() * 15) - 12;
-    const z = -Math.random() * 7 - 5;
+    const x = Math.random() * 80 - 40;
+    const y = -(Math.random() * 15) - 13.5;
+    const z = -Math.random() * 7.5 - 5;
     particle.position.set(x, y, z);
     scene.add(particle);
   }
@@ -90,6 +91,17 @@ const ambientLight = new THREE.AmbientLight(0xffffff);
 scene.add(ambientLight);
 
 /**
+ * Init object positions
+ */
+const INIT = {
+  CAMERA: { X_POS: 0, Y_POS: 0, Z_POS: 5, X_ROT: 0 },
+  NAME_TEXT: { X_POS: -50, Y_POS: -3, Z_POS: -33, X_ROT: -0.15, Y_ROT: (7 * Math.PI) / 4 + 0.6, Z_ROT: 0.09 },
+  TRUMPET: { X_POS: -8, Y_POS: 16, Z_POS: -23, X_ROT: -0.2, Y_ROT: -(3 * Math.PI) / 4 + 0.3, Z_ROT: 0, Z_SCALE: 1 },
+  MUSICIAN_TEXT: { X_POS: -200, Y_POS: 25, Z_POS: -30, Z_ROT: -0.15, Y_SCALE: 1.5 },
+  TEXT_GROUP: { X_POS: -8 }
+};
+
+/**
  * Header Title
  */
 /**
@@ -100,9 +112,8 @@ let trumpet = new THREE.Group();
 gltfLoader.load('/trumpet/scene.gltf', gltf => {
   trumpet = gltf.scene;
   scene.add(trumpet);
-  trumpet.position.set(-8, 16, -23);
-  trumpet.rotateX(-0.2);
-  trumpet.rotation.y = -(3 * Math.PI) / 4 + 0.3;
+  trumpet.position.set(INIT.TRUMPET.X_POS, INIT.TRUMPET.Y_POS, INIT.TRUMPET.Z_POS);
+  trumpet.rotation.set(INIT.TRUMPET.X_ROT, INIT.TRUMPET.Y_ROT, INIT.TRUMPET.Z_ROT);
 });
 //const trumpetURL = new URL('../public/trumpet.glb', import.meta.url);
 
@@ -111,25 +122,43 @@ gltfLoader.load('/trumpet/scene.gltf', gltf => {
  */
 const fontLoader = new FontLoader();
 let nameText = new THREE.Mesh();
+let musicianText = new THREE.Mesh();
 const createTitleText = async () => {
   const font = await fontLoader.loadAsync('/Hanken_Grotesk_Regular.json');
-  const textGeometry = new TextGeometry('ALAN JIANG', {
+  const nameTextGeometry = new TextGeometry('ALAN JIANG', {
     font: font,
     size: 11,
     height: 1
   });
   nameText = new THREE.Mesh(
-    textGeometry,
+    nameTextGeometry,
     new THREE.MeshBasicMaterial({
       color: 0xffffff,
       wireframe: true
     })
   );
   nameText.rotateOnAxis(new THREE.Vector3(0, 1, 0), (7 * Math.PI) / 4 + 0.6);
-  nameText.position.set(-50, -3, -33);
-  nameText.rotateX(-0.15);
-  nameText.rotateZ(0.09);
+  nameText.position.set(INIT.NAME_TEXT.X_POS, INIT.NAME_TEXT.Y_POS, INIT.NAME_TEXT.Z_POS);
+  nameText.rotateX(INIT.NAME_TEXT.X_ROT);
+  nameText.rotateZ(INIT.NAME_TEXT.Z_ROT);
   scene.add(nameText);
+
+  const musicianTextGeometry = new TextGeometry('MUSICIAN', {
+    font: font,
+    size: 22,
+    height: 1
+  });
+  musicianText = new THREE.Mesh(
+    musicianTextGeometry,
+    new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      wireframe: true
+    })
+  );
+  musicianText.position.set(INIT.MUSICIAN_TEXT.X_POS, INIT.MUSICIAN_TEXT.Y_POS, INIT.MUSICIAN_TEXT.Z_POS);
+  musicianText.rotation.z = INIT.MUSICIAN_TEXT.Z_ROT;
+  musicianText.scale.y = INIT.MUSICIAN_TEXT.Y_SCALE;
+  scene.add(musicianText);
 };
 createTitleText();
 
@@ -216,7 +245,7 @@ for (let i = 0; i < amount; i++) {
 //const fontLoader = new FontLoader();
 //let text = new THREE.Mesh();
 const textGroup = new THREE.Group();
-textGroup.position.set(0, 0, 0);
+textGroup.position.set(INIT.TEXT_GROUP.X_POS, 0, 0);
 const createText = async (words: string[]) => {
   const font = await fontLoader.loadAsync('/Hanken_Grotesk_Regular.json');
   words.map((e, i) => {
@@ -232,7 +261,7 @@ const createText = async (words: string[]) => {
       })
     );
     //text.position.set(-10 + i, -35, -15);
-    text.position.set(-1 + 30 * i, -16, -36);
+    text.position.set(-1 + 35 * i, -16, -36);
     //scene.add(text);
     textGroup.add(text);
   });
@@ -293,6 +322,7 @@ let currScrollY = window.scrollY;
 const maxY = document.documentElement.scrollHeight - document.documentElement.clientHeight;
 let scrollPercent = 0.0;
 window.addEventListener('scroll', () => {
+  //console.log(scrollPercent);
   currScrollY = window.scrollY;
   scrollPercent = currScrollY / maxY;
 });
@@ -413,8 +443,12 @@ function tick(delta: number) {
   }
 }
 
-let nameTextParam = { x: -50, y: -3, z: -33 };
-let trumpetParam = { yRotation: -(3 * Math.PI) / 4 + 0.3, xPosition: -8, zPosition: -23 };
+let cameraParam = structuredClone(INIT.CAMERA);
+let nameTextParam = structuredClone(INIT.NAME_TEXT);
+let trumpetParam = structuredClone(INIT.TRUMPET);
+let musicianTextParam = structuredClone(INIT.MUSICIAN_TEXT);
+let textGroupParam = structuredClone(INIT.TEXT_GROUP);
+
 //controls.update();
 /**
  * animation
@@ -423,10 +457,16 @@ const animate = () => {
   // delta for consistency
   const delta = clock.getDelta();
   tick(delta);
+  camera.position.set(cameraParam.X_POS, cameraParam.Y_POS, cameraParam.Z_POS);
+  camera.rotation.x = cameraParam.X_ROT;
 
-  nameText.position.set(nameTextParam.x, nameTextParam.y, nameTextParam.z);
-  trumpet.rotation.y = trumpetParam.yRotation;
-  trumpet.position.set(trumpetParam.xPosition, 16, trumpetParam.zPosition);
+  nameText.position.set(nameTextParam.X_POS, nameTextParam.Y_POS, nameTextParam.Z_POS);
+  trumpet.rotation.set(trumpetParam.X_ROT, trumpetParam.Y_ROT, trumpetParam.Z_ROT);
+  trumpet.position.set(trumpetParam.X_POS, trumpetParam.Y_POS, trumpetParam.Z_POS);
+  trumpet.scale.set(1, 1, trumpetParam.Z_SCALE);
+  musicianText.position.set(musicianTextParam.X_POS, musicianTextParam.Y_POS, musicianTextParam.Z_POS);
+
+  textGroup.position.x = textGroupParam.X_POS;
 
   // scroll based animation timeline noob strat - https://sbcode.net/threejs/animate-on-scroll/
   // playTimeLineAnimations();
@@ -448,34 +488,192 @@ let lastScrollTop = window.pageYOffset || document.documentElement.scrollTop;
 let position = 0;
 window.addEventListener('scroll', () => {
   let st = window.pageYOffset || document.documentElement.scrollTop;
-  // down scroll code
-  if (st > lastScrollTop) {
-    scrollUp = false;
-  }
-  // up scroll code
-  else {
-    scrollUp = true;
-  }
+  scrollUp = st > lastScrollTop ? false : true;
   lastScrollTop = st <= 0 ? 0 : st;
 
-  if (scrollPercent > 0.05 && scrollPercent < 0.1 && position == 0 && !scrollUp) {
+  /**
+   * scroll down animations
+   */
+  if (position == 0 && !scrollUp && scrollPercent > 0.05) {
     position = 1;
     gsap.to(trumpetParam, {
       duration: 1,
-      yRotation: (3 * Math.PI) / 4 - 0.2,
-      xPosition: 8,
-      zPosition: -30,
-      ease: 'power1.out'
+      X_ROT: -0.3,
+      Y_ROT: (3 * Math.PI) / 4 - 0.3,
+      X_POS: 5,
+      Y_POS: 14,
+      Z_POS: -30,
+      Z_SCALE: 0.8,
+      ease: 'power2.out'
+    });
+    gsap.to(musicianTextParam, {
+      duration: 1,
+      X_POS: -72,
+      Y_POS: 0,
+      Z_POS: -40,
+      ease: 'power2.out'
+    });
+    gsap.to(scene.background, {
+      duration: 1,
+      r: 0,
+      g: 0,
+      b: 0,
+      ease: 'power2.out'
     });
   }
-  if (scrollPercent < 0.05 && scrollUp && position == 1) {
+  //move camera to scheherazade
+  if (position == 1 && !scrollUp && scrollPercent > 0.18) {
+    position = 2;
+    gsap.to(cameraParam, {
+      duration: 2,
+      Y_POS: -28,
+      Z_POS: -7,
+      X_ROT: -Math.PI / 4,
+      ease: 'power2.out'
+    });
+  }
+  //festive overture
+  if (position == 2 && !scrollUp && scrollPercent > 0.26) {
+    position = 3;
+    gsap.to(textGroupParam, {
+      duration: 1,
+      X_POS: -44,
+      ease: 'power2.out'
+    });
+  }
+  //haydn
+  if (position == 3 && !scrollUp && scrollPercent > 0.34) {
+    position = 4;
+    gsap.to(textGroupParam, {
+      duration: 1,
+      X_POS: -79,
+      ease: 'power2.out'
+    });
+  }
+  //neruda
+  if (position == 4 && !scrollUp && scrollPercent > 0.42) {
+    position = 5;
+    gsap.to(textGroupParam, {
+      duration: 1,
+      X_POS: -114,
+      ease: 'power2.out'
+    });
+  }
+  //petrushka
+  if (position == 5 && !scrollUp && scrollPercent > 0.5) {
+    position = 6;
+    gsap.to(textGroupParam, {
+      duration: 1,
+      X_POS: -145.5,
+      ease: 'power2.out'
+    });
+  }
+
+  if (position == 6 && !scrollUp && scrollPercent > 0.58) {
+    position = 7;
+    gsap.to(textGroupParam, {
+      duration: 1,
+      X_POS: -183,
+      ease: 'power2.out'
+    });
+  }
+
+  if (position == 7 && !scrollUp && scrollPercent > 0.66) {
+    position = 8;
+    gsap.to(textGroupParam, {
+      duration: 1,
+      X_POS: -223,
+      ease: 'power2.out'
+    });
+  }
+
+  /**
+   * scroll up animations
+   */
+  if (position == 1 && scrollUp && scrollPercent < 0.05) {
     position = 0;
     gsap.to(trumpetParam, {
       duration: 1,
-      yRotation: -(3 * Math.PI) / 4 + 0.3,
-      xPosition: -8,
-      zPosition: -23,
-      ease: 'power1.out'
+      X_POS: INIT.TRUMPET.X_POS,
+      Y_POS: INIT.TRUMPET.Y_POS,
+      Z_POS: INIT.TRUMPET.Z_POS,
+      X_ROT: INIT.TRUMPET.X_ROT,
+      Y_ROT: INIT.TRUMPET.Y_ROT,
+      Z_ROT: INIT.TRUMPET.Z_ROT,
+      Z_SCALE: INIT.TRUMPET.Z_SCALE,
+      ease: 'power2.out'
+    });
+    gsap.to(musicianTextParam, {
+      duration: 1,
+      X_POS: INIT.MUSICIAN_TEXT.X_POS,
+      Y_POS: INIT.MUSICIAN_TEXT.Y_POS,
+      Z_POS: INIT.MUSICIAN_TEXT.Z_POS,
+      ease: 'power2.out'
+    });
+    gsap.to(scene.background, {
+      duration: 1,
+      r: 239 / 255,
+      g: 226 / 255,
+      b: 186 / 255
+    });
+  }
+
+  if (position == 2 && scrollUp && scrollPercent < 0.18) {
+    position = 1;
+    gsap.to(cameraParam, {
+      duration: 2,
+      Y_POS: INIT.CAMERA.Y_POS,
+      Z_POS: INIT.CAMERA.Z_POS,
+      X_ROT: INIT.CAMERA.X_ROT,
+      ease: 'power2.out'
+    });
+  }
+  if (position == 3 && scrollUp && scrollPercent < 0.26) {
+    position = 2;
+    gsap.to(textGroupParam, {
+      duration: 1,
+      X_POS: INIT.TEXT_GROUP.X_POS,
+      ease: 'power2.out'
+    });
+  }
+  if (position == 4 && scrollUp && scrollPercent < 0.34) {
+    position = 3;
+    gsap.to(textGroupParam, {
+      duration: 1,
+      X_POS: -44,
+      ease: 'power2.out'
+    });
+  }
+  if (position == 5 && scrollUp && scrollPercent < 0.42) {
+    position = 4;
+    gsap.to(textGroupParam, {
+      duration: 1,
+      X_POS: -79,
+      ease: 'power2.out'
+    });
+  }
+  if (position == 6 && scrollUp && scrollPercent < 0.5) {
+    position = 5;
+    gsap.to(textGroupParam, {
+      duration: 1,
+      X_POS: -114,
+      ease: 'power2.out'
+    });
+  }
+  if (position == 7 && scrollUp && scrollPercent < 0.58) {
+    position = 6;
+    gsap.to(textGroupParam, {
+      duration: 1,
+      X_POS: -145.5,
+      ease: 'power2.out'
+    });
+  }
+  if (position == 8 && scrollUp && scrollPercent < 0.62) {
+    position = 7;
+    gsap.to(textGroupParam, {
+      duration: 1,
+      X_POS: -183,
+      ease: 'power2.out'
     });
   }
 });
@@ -499,10 +697,10 @@ timeline
   .to(
     nameTextParam,
     {
-      duration: 20, // duration
-      x: 50,
-      y: 5,
-      z: -5,
+      duration: 12, // duration
+      X_POS: 50,
+      Y_POS: 5,
+      Z_POS: -5,
       ease: 'power1.out'
     },
     0 // start time
@@ -510,13 +708,13 @@ timeline
   .to(
     nameTextParam,
     {
-      duration: 20,
-      x: -50,
-      y: -3,
-      z: -33,
+      duration: 12,
+      X_POS: -50,
+      Y_POS: -3,
+      Z_POS: -33,
       ease: 'power1.out'
     },
-    20
+    12
   )
   // to make start time a percentage out of 100 from total duration
   .to(nameTextParam, {}, 100);
