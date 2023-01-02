@@ -7,6 +7,12 @@ import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
+// import shaders sus way because normal way doesn't work?????
+let response = await fetch('/shaders/scrollFragment.glsl');
+const fragment = await response.text();
+response = await fetch('/shaders/scrollVertex.glsl');
+const vertex = await response.text();
+
 /**
  * Set up
  */
@@ -41,8 +47,7 @@ renderer.render(scene, camera);
  */
 //const background = new THREE.TextureLoader().load('/background.jpg');
 //scene.background = background;
-//scene.background = new THREE.Color(0xefe2ba);
-scene.background = new THREE.Color(0x0000ff);
+scene.background = new THREE.Color(0xefe2ba);
 
 // add background stars
 function genStars(num: number) {
@@ -95,8 +100,9 @@ scene.add(ambientLight);
  */
 const INIT = {
   CAMERA: { X_POS: 0, Y_POS: 0, Z_POS: 5, X_ROT: 0 },
-  NAME_TEXT: { X_POS: -50, Y_POS: -3, Z_POS: -33, X_ROT: -0.15, Y_ROT: (7 * Math.PI) / 4 + 0.6, Z_ROT: 0.09 },
-  TRUMPET: { X_POS: -8, Y_POS: 16, Z_POS: -23, X_ROT: -0.2, Y_ROT: -(3 * Math.PI) / 4 + 0.3, Z_ROT: 0, Z_SCALE: 1 },
+  SCROLL: { X_SCALE: 1, Y_SCALE: 1, Z_SCALE: 1 },
+  NAME_TEXT: { X_POS: -50, Y_POS: -1, Z_POS: -33, X_ROT: -0.15, Y_ROT: (7 * Math.PI) / 4 + 0.6, Z_ROT: 0.09 },
+  TRUMPET: { X_POS: -8, Y_POS: 18, Z_POS: -23, X_ROT: -0.2, Y_ROT: -(3 * Math.PI) / 4 + 0.3, Z_ROT: 0, Z_SCALE: 1 },
   MUSICIAN_TEXT: { X_POS: -200, Y_POS: 25, Z_POS: -30, Z_ROT: -0.15, Y_SCALE: 1.5 },
   TEXT_GROUP: { X_POS: -8 }
 };
@@ -109,12 +115,12 @@ const INIT = {
  */
 const gltfLoader = new GLTFLoader();
 let trumpet = new THREE.Group();
-gltfLoader.load('/trumpet/scene.gltf', gltf => {
-  trumpet = gltf.scene;
-  scene.add(trumpet);
-  trumpet.position.set(INIT.TRUMPET.X_POS, INIT.TRUMPET.Y_POS, INIT.TRUMPET.Z_POS);
-  trumpet.rotation.set(INIT.TRUMPET.X_ROT, INIT.TRUMPET.Y_ROT, INIT.TRUMPET.Z_ROT);
-});
+const gltf = await gltfLoader.loadAsync('/trumpet/scene.gltf');
+trumpet = gltf.scene;
+scene.add(trumpet);
+trumpet.position.set(INIT.TRUMPET.X_POS, INIT.TRUMPET.Y_POS, INIT.TRUMPET.Z_POS);
+trumpet.rotation.set(INIT.TRUMPET.X_ROT, INIT.TRUMPET.Y_ROT, INIT.TRUMPET.Z_ROT);
+
 //const trumpetURL = new URL('../public/trumpet.glb', import.meta.url);
 
 /**
@@ -123,44 +129,68 @@ gltfLoader.load('/trumpet/scene.gltf', gltf => {
 const fontLoader = new FontLoader();
 let nameText = new THREE.Mesh();
 let musicianText = new THREE.Mesh();
-const createTitleText = async () => {
-  const font = await fontLoader.loadAsync('/Hanken_Grotesk_Regular.json');
-  const nameTextGeometry = new TextGeometry('ALAN JIANG', {
-    font: font,
-    size: 11,
-    height: 1
-  });
-  nameText = new THREE.Mesh(
-    nameTextGeometry,
-    new THREE.MeshBasicMaterial({
-      color: 0xffffff,
-      wireframe: true
-    })
-  );
-  nameText.rotateOnAxis(new THREE.Vector3(0, 1, 0), (7 * Math.PI) / 4 + 0.6);
-  nameText.position.set(INIT.NAME_TEXT.X_POS, INIT.NAME_TEXT.Y_POS, INIT.NAME_TEXT.Z_POS);
-  nameText.rotateX(INIT.NAME_TEXT.X_ROT);
-  nameText.rotateZ(INIT.NAME_TEXT.Z_ROT);
-  scene.add(nameText);
+let scrollText = new THREE.Mesh();
 
-  const musicianTextGeometry = new TextGeometry('MUSICIAN', {
-    font: font,
-    size: 22,
-    height: 1
-  });
-  musicianText = new THREE.Mesh(
-    musicianTextGeometry,
-    new THREE.MeshBasicMaterial({
-      color: 0xffffff,
-      wireframe: true
-    })
-  );
-  musicianText.position.set(INIT.MUSICIAN_TEXT.X_POS, INIT.MUSICIAN_TEXT.Y_POS, INIT.MUSICIAN_TEXT.Z_POS);
-  musicianText.rotation.z = INIT.MUSICIAN_TEXT.Z_ROT;
-  musicianText.scale.y = INIT.MUSICIAN_TEXT.Y_SCALE;
-  scene.add(musicianText);
+const font = await fontLoader.loadAsync('/Hanken_Grotesk_Regular.json');
+const nameTextGeometry = new TextGeometry('ALAN JIANG', {
+  font: font,
+  size: 11,
+  height: 1
+});
+nameText = new THREE.Mesh(
+  nameTextGeometry,
+  new THREE.MeshBasicMaterial({
+    color: 0xffffff,
+    wireframe: true
+  })
+);
+nameText.rotateOnAxis(new THREE.Vector3(0, 1, 0), (7 * Math.PI) / 4 + 0.6);
+nameText.position.set(INIT.NAME_TEXT.X_POS, INIT.NAME_TEXT.Y_POS, INIT.NAME_TEXT.Z_POS);
+nameText.rotateX(INIT.NAME_TEXT.X_ROT);
+nameText.rotateZ(INIT.NAME_TEXT.Z_ROT);
+scene.add(nameText);
+
+const musicianTextGeometry = new TextGeometry('MUSICIAN', {
+  font: font,
+  size: 22,
+  height: 1
+});
+musicianText = new THREE.Mesh(
+  musicianTextGeometry,
+  new THREE.MeshBasicMaterial({
+    color: 0xffffff,
+    wireframe: true
+  })
+);
+musicianText.position.set(INIT.MUSICIAN_TEXT.X_POS, INIT.MUSICIAN_TEXT.Y_POS, INIT.MUSICIAN_TEXT.Z_POS);
+musicianText.rotation.z = INIT.MUSICIAN_TEXT.Z_ROT;
+musicianText.scale.y = INIT.MUSICIAN_TEXT.Y_SCALE;
+scene.add(musicianText);
+
+//console.log(fragment);
+
+const scrollTextGeometry = new TextGeometry('SCROLL TO NAVIGATE  -  SCROLL TO NAVIGATE  -  ', {
+  font: font,
+  size: 0.015,
+  height: 0
+});
+scrollText = new THREE.Mesh(
+  scrollTextGeometry,
+  new THREE.ShaderMaterial({
+    side: THREE.DoubleSide,
+    uniforms: {
+      textLength: { value: 0.479 }
+    },
+    vertexShader: vertex,
+    fragmentShader: fragment
+  })
+);
+scrollText.position.set(0, -2.5, 0);
+scene.add(scrollText);
+updatables.push(scrollText);
+(scrollText as any).tick = (delta: number) => {
+  scrollText.rotation.z -= 0.35 * delta;
 };
-createTitleText();
 
 /**
  * TorusKnot
@@ -246,28 +276,8 @@ for (let i = 0; i < amount; i++) {
 //let text = new THREE.Mesh();
 const textGroup = new THREE.Group();
 textGroup.position.set(INIT.TEXT_GROUP.X_POS, 0, 0);
-const createText = async (words: string[]) => {
-  const font = await fontLoader.loadAsync('/Hanken_Grotesk_Regular.json');
-  words.map((e, i) => {
-    const textGeometry = new TextGeometry(e, {
-      font: font,
-      size: 2,
-      height: 0.1
-    });
-    const text = new THREE.Mesh(
-      textGeometry,
-      new THREE.MeshBasicMaterial({
-        color: 0xffffff
-      })
-    );
-    //text.position.set(-10 + i, -35, -15);
-    text.position.set(-1 + 35 * i, -16, -36);
-    //scene.add(text);
-    textGroup.add(text);
-  });
-  scene.add(textGroup);
-};
-createText([
+
+const words = [
   'Scheherazade',
   'Festive Overture',
   'Haydn Concerto',
@@ -275,7 +285,26 @@ createText([
   'Petrushka',
   'Yoru ni Kakeru',
   'O Magnum Mysterium'
-]);
+];
+const fontStyle = await fontLoader.loadAsync('/Hanken_Grotesk_Regular.json');
+words.map((e, i) => {
+  const textGeometry = new TextGeometry(e, {
+    font: fontStyle,
+    size: 2,
+    height: 0.1
+  });
+  const text = new THREE.Mesh(
+    textGeometry,
+    new THREE.MeshBasicMaterial({
+      color: 0xffffff
+    })
+  );
+  //text.position.set(-10 + i, -35, -15);
+  text.position.set(-1 + 35 * i, -16, -36);
+  //scene.add(text);
+  textGroup.add(text);
+});
+scene.add(textGroup);
 
 //updatables.push(textGroup);
 (textGroup as any).tick = (delta: number) => {
@@ -444,12 +473,12 @@ function tick(delta: number) {
 }
 
 let cameraParam = structuredClone(INIT.CAMERA);
+let scrollParam = structuredClone(INIT.SCROLL);
 let nameTextParam = structuredClone(INIT.NAME_TEXT);
 let trumpetParam = structuredClone(INIT.TRUMPET);
 let musicianTextParam = structuredClone(INIT.MUSICIAN_TEXT);
 let textGroupParam = structuredClone(INIT.TEXT_GROUP);
 
-//controls.update();
 /**
  * animation
  */
@@ -460,6 +489,7 @@ const animate = () => {
   camera.position.set(cameraParam.X_POS, cameraParam.Y_POS, cameraParam.Z_POS);
   camera.rotation.x = cameraParam.X_ROT;
 
+  scrollText.scale.set(scrollParam.X_SCALE, scrollParam.Y_SCALE, scrollParam.Z_SCALE);
   nameText.position.set(nameTextParam.X_POS, nameTextParam.Y_POS, nameTextParam.Z_POS);
   trumpet.rotation.set(trumpetParam.X_ROT, trumpetParam.Y_ROT, trumpetParam.Z_ROT);
   trumpet.position.set(trumpetParam.X_POS, trumpetParam.Y_POS, trumpetParam.Z_POS);
@@ -497,7 +527,7 @@ window.addEventListener('scroll', () => {
   if (position == 0 && !scrollUp && scrollPercent > 0.05) {
     position = 1;
     gsap.to(trumpetParam, {
-      duration: 1,
+      duration: 1.5,
       X_ROT: -0.3,
       Y_ROT: (3 * Math.PI) / 4 - 0.3,
       X_POS: 5,
@@ -507,14 +537,21 @@ window.addEventListener('scroll', () => {
       ease: 'power2.out'
     });
     gsap.to(musicianTextParam, {
-      duration: 1,
+      duration: 1.5,
       X_POS: -72,
       Y_POS: 0,
       Z_POS: -40,
       ease: 'power2.out'
     });
+    gsap.to(scrollParam, {
+      duration: 0.5,
+      X_SCALE: 0.0,
+      Y_SCALE: 0.0,
+      Z_SCALE: 0.0,
+      ease: 'power2.out'
+    });
     gsap.to(scene.background, {
-      duration: 1,
+      duration: 1.5,
       r: 0,
       g: 0,
       b: 0,
@@ -529,6 +566,17 @@ window.addEventListener('scroll', () => {
       Y_POS: -28,
       Z_POS: -7,
       X_ROT: -Math.PI / 4,
+      onComplete: () => {
+        if (position == 2) {
+          gsap.to(scene.background, {
+            duration: 0.8,
+            r: 2 / 255,
+            g: 56 / 255,
+            b: 60 / 255,
+            ease: 'power2.out'
+          });
+        }
+      },
       ease: 'power2.out'
     });
   }
@@ -540,6 +588,13 @@ window.addEventListener('scroll', () => {
       X_POS: -44,
       ease: 'power2.out'
     });
+    gsap.to(scene.background, {
+      duration: 1,
+      r: 139 / 255,
+      g: 211 / 255,
+      b: 230 / 255,
+      ease: 'power2.out'
+    });
   }
   //haydn
   if (position == 3 && !scrollUp && scrollPercent > 0.34) {
@@ -547,6 +602,13 @@ window.addEventListener('scroll', () => {
     gsap.to(textGroupParam, {
       duration: 1,
       X_POS: -79,
+      ease: 'power2.out'
+    });
+    gsap.to(scene.background, {
+      duration: 1,
+      r: 246 / 255,
+      g: 164 / 255,
+      b: 164 / 255,
       ease: 'power2.out'
     });
   }
@@ -558,6 +620,13 @@ window.addEventListener('scroll', () => {
       X_POS: -114,
       ease: 'power2.out'
     });
+    gsap.to(scene.background, {
+      duration: 1,
+      r: 199 / 255,
+      g: 188 / 255,
+      b: 161 / 255,
+      ease: 'power2.out'
+    });
   }
   //petrushka
   if (position == 5 && !scrollUp && scrollPercent > 0.5) {
@@ -567,8 +636,15 @@ window.addEventListener('scroll', () => {
       X_POS: -145.5,
       ease: 'power2.out'
     });
+    gsap.to(scene.background, {
+      duration: 1,
+      r: 127 / 255,
+      g: 102 / 255,
+      b: 157 / 255,
+      ease: 'power2.out'
+    });
   }
-
+  //yoru ni kakeru
   if (position == 6 && !scrollUp && scrollPercent > 0.58) {
     position = 7;
     gsap.to(textGroupParam, {
@@ -576,13 +652,27 @@ window.addEventListener('scroll', () => {
       X_POS: -183,
       ease: 'power2.out'
     });
+    gsap.to(scene.background, {
+      duration: 1,
+      r: 99 / 255,
+      g: 38 / 255,
+      b: 38 / 255,
+      ease: 'power2.out'
+    });
   }
-
+  //o magnum mysterium
   if (position == 7 && !scrollUp && scrollPercent > 0.66) {
     position = 8;
     gsap.to(textGroupParam, {
       duration: 1,
       X_POS: -223,
+      ease: 'power2.out'
+    });
+    gsap.to(scene.background, {
+      duration: 1,
+      r: 137 / 255,
+      g: 138 / 255,
+      b: 166 / 255,
       ease: 'power2.out'
     });
   }
@@ -593,7 +683,7 @@ window.addEventListener('scroll', () => {
   if (position == 1 && scrollUp && scrollPercent < 0.05) {
     position = 0;
     gsap.to(trumpetParam, {
-      duration: 1,
+      duration: 1.5,
       X_POS: INIT.TRUMPET.X_POS,
       Y_POS: INIT.TRUMPET.Y_POS,
       Z_POS: INIT.TRUMPET.Z_POS,
@@ -604,14 +694,21 @@ window.addEventListener('scroll', () => {
       ease: 'power2.out'
     });
     gsap.to(musicianTextParam, {
-      duration: 1,
+      duration: 1.5,
       X_POS: INIT.MUSICIAN_TEXT.X_POS,
       Y_POS: INIT.MUSICIAN_TEXT.Y_POS,
       Z_POS: INIT.MUSICIAN_TEXT.Z_POS,
       ease: 'power2.out'
     });
+    gsap.to(scrollParam, {
+      duration: 0.5,
+      X_SCALE: INIT.SCROLL.X_SCALE,
+      Y_SCALE: INIT.SCROLL.Y_SCALE,
+      Z_SCALE: INIT.SCROLL.Z_SCALE,
+      ease: 'power2.out'
+    });
     gsap.to(scene.background, {
-      duration: 1,
+      duration: 1.5,
       r: 239 / 255,
       g: 226 / 255,
       b: 186 / 255
@@ -621,10 +718,17 @@ window.addEventListener('scroll', () => {
   if (position == 2 && scrollUp && scrollPercent < 0.18) {
     position = 1;
     gsap.to(cameraParam, {
-      duration: 2,
+      duration: 2.5,
       Y_POS: INIT.CAMERA.Y_POS,
       Z_POS: INIT.CAMERA.Z_POS,
       X_ROT: INIT.CAMERA.X_ROT,
+      ease: 'power2.out'
+    });
+    gsap.to(scene.background, {
+      duration: 1.5,
+      r: 0,
+      g: 0,
+      b: 0,
       ease: 'power2.out'
     });
   }
@@ -635,12 +739,26 @@ window.addEventListener('scroll', () => {
       X_POS: INIT.TEXT_GROUP.X_POS,
       ease: 'power2.out'
     });
+    gsap.to(scene.background, {
+      duration: 0.8,
+      r: 2 / 255,
+      g: 56 / 255,
+      b: 60 / 255,
+      ease: 'power2.out'
+    });
   }
   if (position == 4 && scrollUp && scrollPercent < 0.34) {
     position = 3;
     gsap.to(textGroupParam, {
       duration: 1,
       X_POS: -44,
+      ease: 'power2.out'
+    });
+    gsap.to(scene.background, {
+      duration: 1,
+      r: 139 / 255,
+      g: 211 / 255,
+      b: 230 / 255,
       ease: 'power2.out'
     });
   }
@@ -651,12 +769,26 @@ window.addEventListener('scroll', () => {
       X_POS: -79,
       ease: 'power2.out'
     });
+    gsap.to(scene.background, {
+      duration: 1,
+      r: 246 / 255,
+      g: 164 / 255,
+      b: 164 / 255,
+      ease: 'power2.out'
+    });
   }
   if (position == 6 && scrollUp && scrollPercent < 0.5) {
     position = 5;
     gsap.to(textGroupParam, {
       duration: 1,
       X_POS: -114,
+      ease: 'power2.out'
+    });
+    gsap.to(scene.background, {
+      duration: 1,
+      r: 199 / 255,
+      g: 188 / 255,
+      b: 161 / 255,
       ease: 'power2.out'
     });
   }
@@ -667,12 +799,26 @@ window.addEventListener('scroll', () => {
       X_POS: -145.5,
       ease: 'power2.out'
     });
+    gsap.to(scene.background, {
+      duration: 1,
+      r: 127 / 255,
+      g: 102 / 255,
+      b: 157 / 255,
+      ease: 'power2.out'
+    });
   }
   if (position == 8 && scrollUp && scrollPercent < 0.62) {
     position = 7;
     gsap.to(textGroupParam, {
       duration: 1,
       X_POS: -183,
+      ease: 'power2.out'
+    });
+    gsap.to(scene.background, {
+      duration: 1,
+      r: 99 / 255,
+      g: 38 / 255,
+      b: 38 / 255,
       ease: 'power2.out'
     });
   }
