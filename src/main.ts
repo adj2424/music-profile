@@ -2,195 +2,35 @@ import './style.css';
 import * as THREE from 'three';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/all';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
-import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
-// import shaders sus way because normal way doesn't work?????
-let response = await fetch('/shaders/scrollFragment.glsl');
-const fragment = await response.text();
-response = await fetch('/shaders/scrollVertex.glsl');
-const vertex = await response.text();
-
-/**
- * Set up
- */
-const windowSize = {
-  width: window.innerWidth,
-  height: window.innerHeight
-};
-const scene = new THREE.Scene();
-
-// camera group
-const cameraGroup = new THREE.Group();
-scene.add(cameraGroup);
-
-const camera = new THREE.PerspectiveCamera(75, windowSize.width / windowSize.height, 0.1, 1000);
-//cameraGroup.add(camera);
-
-const renderer = new THREE.WebGLRenderer({
-  canvas: document.querySelector('#bg')!,
-  antialias: true
-});
+import Init from './init';
+import Config from './config';
+import Repertoire from './repertoire';
+import Title from './title';
 
 // all child objects where it will be animated through tick method
 const updatables: any[] = [];
 
-renderer.setPixelRatio(window.devicePixelRatio);
-renderer.setSize(windowSize.width, windowSize.height);
-camera.position.setZ(5);
-renderer.render(scene, camera);
-
 /**
- * Background
+ * Set up
  */
-//const background = new THREE.TextureLoader().load('/background.jpg');
-//scene.background = background;
-scene.background = new THREE.Color(0xefe2ba);
+const world = new Init();
+const { scene, camera, cameraGroup, renderer, cursor } = world;
+updatables.push(world);
 
-// add background stars
-function genStars(num: number) {
-  for (let i = 0; i < num; i++) {
-    const starGeometry = new THREE.TorusKnotGeometry(1, 0.1, 30, 10);
-    const starMaterial = new THREE.MeshBasicMaterial({
-      wireframe: true,
-      color: 0x0000ff
-    });
-    const star = new THREE.Mesh(starGeometry, starMaterial);
-    const x = Math.random() * (100 + 100) - 100;
-    const y = -(Math.random() * (100 + 100));
-    const z = -Math.random() * 100 + 5;
-    star.position.set(x, y, z);
-    updatables.push(star);
-    (star as any).tick = (delta: number) => {
-      star.rotation.x += 1 * delta;
-    };
-    scene.add(star);
-  }
-}
-//genStars(100);
-
-// add particles
-function genParticles(num: number) {
-  for (let i = 0; i < num; i++) {
-    const particleGeometry = new THREE.SphereGeometry(0.1, 8, 8);
-    const particleMaterial = new THREE.MeshBasicMaterial({
-      color: 0x0000ff,
-      wireframe: true
-    });
-    const particle = new THREE.Mesh(particleGeometry, particleMaterial);
-    const x = Math.random() * 80 - 40;
-    const y = -(Math.random() * 15) - 13.5;
-    const z = -Math.random() * 7.5 - 5;
-    particle.position.set(x, y, z);
-    scene.add(particle);
-  }
-}
-genParticles(80);
-
-/**
- * Light Source
- */
-const ambientLight = new THREE.AmbientLight(0xffffff);
-scene.add(ambientLight);
-
-/**
- * Init object positions
- */
-const INIT = {
-  CAMERA: { X_POS: 0, Y_POS: 0, Z_POS: 5, X_ROT: 0 },
-  SCROLL: { X_SCALE: 1, Y_SCALE: 1, Z_SCALE: 1 },
-  NAME_TEXT: { X_POS: -50, Y_POS: -1, Z_POS: -33, X_ROT: -0.15, Y_ROT: (7 * Math.PI) / 4 + 0.6, Z_ROT: 0.09 },
-  TRUMPET: { X_POS: -8, Y_POS: 18, Z_POS: -23, X_ROT: -0.2, Y_ROT: -(3 * Math.PI) / 4 + 0.3, Z_ROT: 0, Z_SCALE: 1 },
-  MUSICIAN_TEXT: { X_POS: -200, Y_POS: 25, Z_POS: -30, Z_ROT: -0.15, Y_SCALE: 1.5 },
-  TEXT_GROUP: { X_POS: -8 }
-};
+// Initial object positions
+const INIT = new Config().INIT;
 
 /**
  * Header Title
  */
-/**
- * Trumpet
- */
-const gltfLoader = new GLTFLoader();
-let trumpet = new THREE.Group();
-const gltf = await gltfLoader.loadAsync('/trumpet/scene.gltf');
-trumpet = gltf.scene;
-scene.add(trumpet);
-trumpet.position.set(INIT.TRUMPET.X_POS, INIT.TRUMPET.Y_POS, INIT.TRUMPET.Z_POS);
-trumpet.rotation.set(INIT.TRUMPET.X_ROT, INIT.TRUMPET.Y_ROT, INIT.TRUMPET.Z_ROT);
-
-//const trumpetURL = new URL('../public/trumpet.glb', import.meta.url);
-
-/**
- * Text
- */
-const fontLoader = new FontLoader();
-let nameText = new THREE.Mesh();
-let musicianText = new THREE.Mesh();
-let scrollText = new THREE.Mesh();
-
-const font = await fontLoader.loadAsync('/Hanken_Grotesk_Regular.json');
-const nameTextGeometry = new TextGeometry('ALAN JIANG', {
-  font: font,
-  size: 11,
-  height: 1
-});
-nameText = new THREE.Mesh(
-  nameTextGeometry,
-  new THREE.MeshBasicMaterial({
-    color: 0xffffff,
-    wireframe: true
-  })
-);
-nameText.rotateOnAxis(new THREE.Vector3(0, 1, 0), (7 * Math.PI) / 4 + 0.6);
-nameText.position.set(INIT.NAME_TEXT.X_POS, INIT.NAME_TEXT.Y_POS, INIT.NAME_TEXT.Z_POS);
-nameText.rotateX(INIT.NAME_TEXT.X_ROT);
-nameText.rotateZ(INIT.NAME_TEXT.Z_ROT);
-scene.add(nameText);
-
-const musicianTextGeometry = new TextGeometry('MUSICIAN', {
-  font: font,
-  size: 22,
-  height: 1
-});
-musicianText = new THREE.Mesh(
-  musicianTextGeometry,
-  new THREE.MeshBasicMaterial({
-    color: 0xffffff,
-    wireframe: true
-  })
-);
-musicianText.position.set(INIT.MUSICIAN_TEXT.X_POS, INIT.MUSICIAN_TEXT.Y_POS, INIT.MUSICIAN_TEXT.Z_POS);
-musicianText.rotation.z = INIT.MUSICIAN_TEXT.Z_ROT;
-musicianText.scale.y = INIT.MUSICIAN_TEXT.Y_SCALE;
-scene.add(musicianText);
-
-//console.log(fragment);
-
-const scrollTextGeometry = new TextGeometry('SCROLL TO NAVIGATE  -  SCROLL TO NAVIGATE  -  ', {
-  font: font,
-  size: 0.015,
-  height: 0
-});
-scrollText = new THREE.Mesh(
-  scrollTextGeometry,
-  new THREE.ShaderMaterial({
-    side: THREE.DoubleSide,
-    uniforms: {
-      textLength: { value: 0.479 }
-    },
-    vertexShader: vertex,
-    fragmentShader: fragment
-  })
-);
-scrollText.position.set(0, -2.5, 0);
-scene.add(scrollText);
-updatables.push(scrollText);
-(scrollText as any).tick = (delta: number) => {
-  scrollText.rotation.z -= 0.35 * delta;
-};
+await Title.init();
+updatables.push(Title);
+scene.add(Title.trumpet);
+scene.add(Title.nameText);
+scene.add(Title.musicianText);
+scene.add(Title.scrollText);
 
 /**
  * TorusKnot
@@ -223,245 +63,14 @@ updatables.push(torusKnotGroup);
 };
 
 /**
- * rotating stuff
+ * repertoire stuff
  */
-let cylinderGeometry = new THREE.CylinderGeometry(1, 1, 3, 10);
-const material = new THREE.MeshBasicMaterial({
-  color: 0x0000ff,
-  wireframe: true
-});
-const cylinder = new THREE.Mesh(cylinderGeometry, material);
-cylinder.position.set(0, -35, -14);
-
-(cylinder as any).tick = (delta: number) => {
-  //console.log(cylinderGeometry.attributes.position.count);
-  //console.log(cylinderGeometry.vertices);
-  cylinder.rotateOnAxis(new THREE.Vector3(0, 1, 0), delta * 0.5);
-  //cylinder.rotation.y += delta * 0.5;
-};
-cylinder.rotation.x = -Math.PI / 8;
-cylinder.rotation.z = -Math.PI / 10;
-updatables.push(cylinder);
-scene.add(cylinder);
-
-const startGeometry = new THREE.TorusKnotGeometry(0.5, 0.1, 30, 10);
-const starMaterial = new THREE.MeshBasicMaterial({
-  wireframe: true,
-  color: 0x0000ff
-});
-
-let r = 11;
-let amount = 6;
-for (let i = 0; i < amount; i++) {
-  let x = (i * 2 * r) / amount - r;
-  const star = new THREE.Mesh(startGeometry, starMaterial);
-  star.position.x = x;
-  let y = Math.sqrt(Math.pow(r, 2) - Math.pow(x, 2));
-  star.position.z = y;
-  cylinder.add(star);
-}
-
-for (let i = 0; i < amount; i++) {
-  let x = (i * 2 * r) / amount - r;
-  const star = new THREE.Mesh(startGeometry, starMaterial);
-  star.position.x = x;
-  let y = -Math.sqrt(Math.pow(r, 2) - Math.pow(x, 2));
-  star.position.z = y;
-  cylinder.add(star);
-}
+new Repertoire();
+updatables.push(Repertoire);
+scene.add(Repertoire.cylinder);
+scene.add(Repertoire.textGroup);
 
 // twist deprecated - https://medium.com/@crazypixel/geometry-manipulation-in-three-js-twisting-c53782c38bb
-
-//const fontLoader = new FontLoader();
-//let text = new THREE.Mesh();
-const textGroup = new THREE.Group();
-textGroup.position.set(INIT.TEXT_GROUP.X_POS, 0, 0);
-
-const words = [
-  'Scheherazade',
-  'Festive Overture',
-  'Haydn Concerto',
-  'Neruda Concerto',
-  'Petrushka',
-  'Yoru ni Kakeru',
-  'O Magnum Mysterium'
-];
-const fontStyle = await fontLoader.loadAsync('/Hanken_Grotesk_Regular.json');
-words.map((e, i) => {
-  const textGeometry = new TextGeometry(e, {
-    font: fontStyle,
-    size: 2,
-    height: 0.1
-  });
-  const text = new THREE.Mesh(
-    textGeometry,
-    new THREE.MeshBasicMaterial({
-      color: 0xffffff
-    })
-  );
-  //text.position.set(-10 + i, -35, -15);
-  text.position.set(-1 + 35 * i, -16, -36);
-  //scene.add(text);
-  textGroup.add(text);
-});
-scene.add(textGroup);
-
-//updatables.push(textGroup);
-(textGroup as any).tick = (delta: number) => {
-  textGroup.rotation.x += 0.5 * delta;
-};
-textGroup.rotation.x = -Math.PI / 4;
-
-/**
- * helpers
- */
-const gridHelper = new THREE.GridHelper(500);
-//const controls = new OrbitControls(camera, renderer.domElement);
-scene.add(gridHelper);
-
-/**
- * resize window
- */
-window.addEventListener('resize', () => {
-  windowSize.width = window.innerWidth;
-  windowSize.height = window.innerHeight;
-  camera.aspect = windowSize.width / windowSize.height;
-  camera.updateProjectionMatrix();
-  renderer.setSize(windowSize.width, windowSize.height);
-  renderer.setPixelRatio(window.devicePixelRatio);
-  // renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-});
-
-/**
- * cursor parallax
- */
-const cursor = {
-  x: 0,
-  y: 0
-};
-window.addEventListener('mousemove', event => {
-  cursor.x = event.clientX / window.innerWidth - 0.5; // range of -.5, 5
-  cursor.y = event.clientY / window.innerHeight - 0.5; // range of -.5, 5
-});
-
-/**
- * current scroll percentage
- */
-let currScrollY = window.scrollY;
-const maxY = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-let scrollPercent = 0.0;
-window.addEventListener('scroll', () => {
-  //console.log(scrollPercent);
-  currScrollY = window.scrollY;
-  scrollPercent = currScrollY / maxY;
-});
-
-// linear interpolation function
-function lerp(min: number, max: number, ratio: number): number {
-  return (1 - ratio) * min + ratio * max;
-}
-// fit lerp to start and end at scroll percentages
-function scalePercent(start: number, end: number): number {
-  return (scrollPercent - start) / (end - start);
-}
-
-const timeLineScripts: {
-  start: number;
-  end: number;
-  animationFun: () => void;
-}[] = [];
-
-const changeTitleScript = {
-  start: 0.01,
-  end: 0.075,
-  animationFun: () => {
-    // animate camera scroll
-    nameText.position.x = lerp(-50, 100, scalePercent(changeTitleScript.start, changeTitleScript.end));
-    nameText.position.y = lerp(-3, 10, scalePercent(changeTitleScript.start, changeTitleScript.end));
-    nameText.position.z = lerp(-33, 0, scalePercent(changeTitleScript.start, changeTitleScript.end));
-    trumpet.rotation.y = lerp(
-      -(3 * Math.PI) / 4 + 0.3,
-      (3 * Math.PI) / 4 - 0.2,
-      scalePercent(changeTitleScript.start, changeTitleScript.end)
-    );
-    trumpet.position.x = lerp(-8, 8, scalePercent(changeTitleScript.start, changeTitleScript.end));
-    trumpet.position.z = lerp(-23, -30, scalePercent(changeTitleScript.start, changeTitleScript.end));
-
-    //camera.position.y = lerp(0, -9, scalePercent(changeTitleScript.start, changeTitleScript.end));
-  }
-};
-timeLineScripts.push(changeTitleScript);
-
-const moveCameraScript = {
-  start: 0.1,
-  end: 0.2,
-  animationFun: () => {
-    camera.position.y = lerp(0, -12, scalePercent(moveCameraScript.start, moveCameraScript.end));
-    camera.position.z = lerp(5, -8, scalePercent(moveCameraScript.start, moveCameraScript.end));
-    camera.rotation.x = lerp(0, -Math.PI / 4, scalePercent(moveCameraScript.start, moveCameraScript.end));
-  }
-};
-timeLineScripts.push(moveCameraScript);
-
-const moveTextScript = {
-  start: 0.25,
-  end: 0.7,
-  animationFun: () => {
-    textGroup.position.x = lerp(0, -193.5, scalePercent(moveTextScript.start, moveTextScript.end));
-  }
-};
-timeLineScripts.push(moveTextScript);
-
-const changeBackgroundScript = {
-  start: 0.2,
-  end: 0.5,
-  animationFun: () => {
-    if (scrollPercent > 0.48) {
-      gsap.to(scene.background, {
-        duration: 2,
-        r: 1,
-        g: 0,
-        b: 1
-      });
-    }
-    //
-    else if (scrollPercent > 0.35) {
-      gsap.to(scene.background, {
-        duration: 2,
-        r: 0,
-        g: 1,
-        b: 1
-      });
-    }
-    //
-    else if (scrollPercent > 0.22) {
-      gsap.to(scene.background, {
-        duration: 2,
-        r: 0,
-        g: 1,
-        b: 0
-      });
-    }
-    //
-    else {
-      gsap.to(scene.background, {
-        duration: 2,
-        r: 239 / 255,
-        g: 226 / 255,
-        b: 186 / 255
-      });
-    }
-  }
-};
-timeLineScripts.push(changeBackgroundScript);
-
-function playTimeLineAnimations() {
-  for (const script of timeLineScripts) {
-    if (scrollPercent >= script.start && scrollPercent < script.end) {
-      script.animationFun();
-    }
-  }
-}
 
 //animates objects with animations
 const clock = new THREE.Clock();
@@ -489,14 +98,13 @@ const animate = () => {
   camera.position.set(cameraParam.X_POS, cameraParam.Y_POS, cameraParam.Z_POS);
   camera.rotation.x = cameraParam.X_ROT;
 
-  scrollText.scale.set(scrollParam.X_SCALE, scrollParam.Y_SCALE, scrollParam.Z_SCALE);
-  nameText.position.set(nameTextParam.X_POS, nameTextParam.Y_POS, nameTextParam.Z_POS);
-  trumpet.rotation.set(trumpetParam.X_ROT, trumpetParam.Y_ROT, trumpetParam.Z_ROT);
-  trumpet.position.set(trumpetParam.X_POS, trumpetParam.Y_POS, trumpetParam.Z_POS);
-  trumpet.scale.set(1, 1, trumpetParam.Z_SCALE);
-  musicianText.position.set(musicianTextParam.X_POS, musicianTextParam.Y_POS, musicianTextParam.Z_POS);
-
-  textGroup.position.x = textGroupParam.X_POS;
+  Title.scrollText.scale.set(scrollParam.X_SCALE, scrollParam.Y_SCALE, scrollParam.Z_SCALE);
+  Title.nameText.position.set(nameTextParam.X_POS, nameTextParam.Y_POS, nameTextParam.Z_POS);
+  Title.trumpet.rotation.set(trumpetParam.X_ROT, trumpetParam.Y_ROT, trumpetParam.Z_ROT);
+  Title.trumpet.position.set(trumpetParam.X_POS, trumpetParam.Y_POS, trumpetParam.Z_POS);
+  Title.trumpet.scale.set(1, 1, trumpetParam.Z_SCALE);
+  Title.musicianText.position.set(musicianTextParam.X_POS, musicianTextParam.Y_POS, musicianTextParam.Z_POS);
+  Repertoire.textGroup.position.x = textGroupParam.X_POS;
 
   // scroll based animation timeline noob strat - https://sbcode.net/threejs/animate-on-scroll/
   // playTimeLineAnimations();
@@ -516,10 +124,17 @@ renderer.setAnimationLoop(animate);
 let scrollUp = true;
 let lastScrollTop = window.pageYOffset || document.documentElement.scrollTop;
 let position = 0;
+let currScrollY = window.scrollY;
+const maxY = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+let scrollPercent = 0.0;
 window.addEventListener('scroll', () => {
   let st = window.pageYOffset || document.documentElement.scrollTop;
+  // whether scroll is up or down
   scrollUp = st > lastScrollTop ? false : true;
   lastScrollTop = st <= 0 ? 0 : st;
+  currScrollY = window.scrollY;
+  // current scroll percent
+  scrollPercent = currScrollY / maxY;
 
   /**
    * scroll down animations
@@ -590,9 +205,9 @@ window.addEventListener('scroll', () => {
     });
     gsap.to(scene.background, {
       duration: 1,
-      r: 139 / 255,
-      g: 211 / 255,
-      b: 230 / 255,
+      r: 246 / 255,
+      g: 164 / 255,
+      b: 164 / 255,
       ease: 'power2.out'
     });
   }
@@ -606,9 +221,9 @@ window.addEventListener('scroll', () => {
     });
     gsap.to(scene.background, {
       duration: 1,
-      r: 246 / 255,
-      g: 164 / 255,
-      b: 164 / 255,
+      r: 139 / 255,
+      g: 211 / 255,
+      b: 230 / 255,
       ease: 'power2.out'
     });
   }
@@ -756,9 +371,9 @@ window.addEventListener('scroll', () => {
     });
     gsap.to(scene.background, {
       duration: 1,
-      r: 139 / 255,
-      g: 211 / 255,
-      b: 230 / 255,
+      r: 246 / 255,
+      g: 164 / 255,
+      b: 164 / 255,
       ease: 'power2.out'
     });
   }
@@ -771,9 +386,9 @@ window.addEventListener('scroll', () => {
     });
     gsap.to(scene.background, {
       duration: 1,
-      r: 246 / 255,
-      g: 164 / 255,
-      b: 164 / 255,
+      r: 139 / 255,
+      g: 211 / 255,
+      b: 230 / 255,
       ease: 'power2.out'
     });
   }
