@@ -33,15 +33,15 @@ Title.init().then(() => {
   scene.add(Title.nameText);
   scene.add(Title.musicianText);
   scene.add(Title.scrollText);
+  /**
+   * repertoire stuff
+   */
+  new Repertoire();
+  updatables.push(Repertoire);
+  scene.add(Repertoire.cylinder);
+  scene.add(Repertoire.textGroup);
+  renderer.setAnimationLoop(animate);
 });
-
-/**
- * repertoire stuff
- */
-new Repertoire();
-updatables.push(Repertoire);
-scene.add(Repertoire.cylinder);
-scene.add(Repertoire.textGroup);
 
 // twist deprecated - https://medium.com/@crazypixel/geometry-manipulation-in-three-js-twisting-c53782c38bb
 
@@ -95,7 +95,6 @@ const animate = () => {
   cameraGroup.position.y += parallaxY - cameraGroup.position.y * delta * PARALLAX_SENSE; // idk y it works xd
   renderer.render(scene, camera);
 };
-renderer.setAnimationLoop(animate);
 
 /**
  * scroll animation by current scroll position
