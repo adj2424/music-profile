@@ -25,7 +25,6 @@ const INIT = new Config().INIT;
 /**
  * Header Title
  */
-
 Title.init().then(() => {
   updatables.push(Title);
   scene.add(Title.trumpet);
