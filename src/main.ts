@@ -25,13 +25,15 @@ const INIT = new Config().INIT;
 /**
  * Header Title
  */
-await Title.init();
-updatables.push(Title);
-scene.add(Title.trumpet);
-scene.add(Title.trebleClef);
-scene.add(Title.nameText);
-scene.add(Title.musicianText);
-scene.add(Title.scrollText);
+
+Title.init().then(() => {
+  updatables.push(Title);
+  scene.add(Title.trumpet);
+  scene.add(Title.trebleClef);
+  scene.add(Title.nameText);
+  scene.add(Title.musicianText);
+  scene.add(Title.scrollText);
+});
 
 /**
  * repertoire stuff
