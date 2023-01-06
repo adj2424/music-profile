@@ -6,10 +6,12 @@ import Config from './config';
 
 export default class Title {
   static trumpet: THREE.Group;
+  static trebleClef: THREE.Group;
   static nameText: THREE.Mesh<THREE.BufferGeometry, THREE.Material | THREE.Material[]>;
   static musicianText: THREE.Mesh<THREE.BufferGeometry, THREE.Material | THREE.Material[]>;
   static scrollText: THREE.Mesh<THREE.BufferGeometry, THREE.Material | THREE.Material[]>;
   static INIT: any;
+  static frame: number = 0;
 
   //https://dev.to/somedood/the-proper-way-to-write-async-constructors-in-javascript-1o8c
   constructor() {}
@@ -19,6 +21,7 @@ export default class Title {
     this.musicianText = new THREE.Mesh();
     this.scrollText = new THREE.Mesh();
     await this.createTrumpet();
+    await this.createTrebleClef();
     await this.createText();
     return new Title();
   }
@@ -31,6 +34,23 @@ export default class Title {
     trumpet.rotation.set(this.INIT.TRUMPET.X_ROT, this.INIT.TRUMPET.Y_ROT, this.INIT.TRUMPET.Z_ROT);
     this.trumpet = trumpet;
   };
+  static createTrebleClef = async () => {
+    const gltfLoader = new GLTFLoader();
+    const gltf = await gltfLoader.loadAsync('/treblesus.glb');
+    gltf.scene.traverse(child => {
+      if ((child as THREE.Mesh).isMesh) {
+        (child as THREE.Mesh).material = new THREE.MeshBasicMaterial({
+          color: 0xffffff
+        });
+      }
+    });
+    const trebleClef = gltf.scene;
+    trebleClef.scale.set(0.2, 0.2, 0.2);
+    trebleClef.position.set(this.INIT.TREBLE_CLEF.X_POS, this.INIT.TREBLE_CLEF.Y_POS, this.INIT.TREBLE_CLEF.Z_POS);
+    trebleClef.rotation.y = Math.PI;
+    this.trebleClef = trebleClef;
+  };
+
   static createText = async () => {
     const fontLoader = new FontLoader();
     let nameText = new THREE.Mesh();
@@ -41,12 +61,12 @@ export default class Title {
     const nameTextGeometry = new TextGeometry('ALAN JIANG', {
       font: font,
       size: 11,
-      height: 1
+      height: 0.5
     });
     nameText = new THREE.Mesh(
       nameTextGeometry,
       new THREE.MeshBasicMaterial({
-        color: 0xffffff
+        color: 0x2d3033
       })
     );
     nameText.rotateOnAxis(new THREE.Vector3(0, 1, 0), (7 * Math.PI) / 4 + 0.6);
@@ -105,5 +125,9 @@ export default class Title {
 
   static tick = (delta: number) => {
     Title.scrollText.rotation.z -= 0.35 * delta;
+    Title.trebleClef.position.y += 0.001 * Math.sin(Title.frame);
+    Title.trebleClef.rotation.z += 0.0005 * Math.sin(Title.frame);
+    Title.trebleClef.rotateOnAxis(new THREE.Vector3(0, 1, 0), 0.5 * delta);
+    Title.frame += 0.005;
   };
 }

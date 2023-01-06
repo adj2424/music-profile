@@ -36,7 +36,8 @@ export default class Repertoire {
       'Neruda Concerto',
       'Petrushka',
       'Yoru ni Kakeru',
-      'O Magnum Mysterium'
+      'O Magnum Mysterium',
+      'CONTACT ME'
     ]);
   }
 

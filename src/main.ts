@@ -16,7 +16,7 @@ const updatables: any[] = [];
  * Set up
  */
 const world = new Init();
-const { scene, camera, cameraGroup, renderer, cursor } = world;
+const { scene, camera, cameraGroup, renderer, cursor, musicNoteGroup } = world;
 updatables.push(world);
 
 // Initial object positions
@@ -28,39 +28,10 @@ const INIT = new Config().INIT;
 await Title.init();
 updatables.push(Title);
 scene.add(Title.trumpet);
+scene.add(Title.trebleClef);
 scene.add(Title.nameText);
 scene.add(Title.musicianText);
 scene.add(Title.scrollText);
-
-/**
- * TorusKnot
- */
-const torusKnotGeometry = new THREE.TorusKnotGeometry(0.4, 0.05, 100, 20);
-const torusKnotMesh = new THREE.MeshToonMaterial({
-  color: 0x00000ff,
-  wireframe: true
-});
-const torusKnot0 = new THREE.Mesh(torusKnotGeometry, torusKnotMesh);
-const torusKnot1 = new THREE.Mesh(torusKnotGeometry, torusKnotMesh);
-const torusKnot2 = new THREE.Mesh(torusKnotGeometry, torusKnotMesh);
-const torusKnot3 = new THREE.Mesh(torusKnotGeometry, torusKnotMesh);
-const torusKnot4 = new THREE.Mesh(torusKnotGeometry, torusKnotMesh);
-torusKnot0.position.set(6, -2, 0);
-torusKnot1.position.set(8, -2, 0);
-torusKnot2.position.set(10, -2, 0);
-torusKnot3.position.set(12, -2, 0);
-torusKnot4.position.set(14, -2, 0);
-const torusKnotGroup = new THREE.Group();
-torusKnotGroup.position.x = 0;
-torusKnotGroup.add(torusKnot0, torusKnot1, torusKnot2, torusKnot3, torusKnot4);
-scene.add(torusKnotGroup);
-updatables.push(torusKnotGroup);
-(torusKnotGroup as any).tick = (delta: number) => {
-  if (torusKnotGroup.position.x < -22) {
-    torusKnotGroup.position.x = 4;
-  }
-  torusKnotGroup.position.x -= 2 * delta;
-};
 
 /**
  * repertoire stuff
@@ -82,6 +53,8 @@ function tick(delta: number) {
 }
 
 let cameraParam = structuredClone(INIT.CAMERA);
+let trebleClefParam = structuredClone(INIT.TREBLE_CLEF);
+let musicNoteGroupParam = { scale: 1 };
 let scrollParam = structuredClone(INIT.SCROLL);
 let nameTextParam = structuredClone(INIT.NAME_TEXT);
 let trumpetParam = structuredClone(INIT.TRUMPET);
@@ -91,6 +64,8 @@ let textGroupParam = structuredClone(INIT.TEXT_GROUP);
 /**
  * animation
  */
+//const controls = new OrbitControls(camera, renderer.domElement);
+//controls.update();
 const animate = () => {
   // delta for consistency
   const delta = clock.getDelta();
@@ -98,6 +73,8 @@ const animate = () => {
   camera.position.set(cameraParam.X_POS, cameraParam.Y_POS, cameraParam.Z_POS);
   camera.rotation.x = cameraParam.X_ROT;
 
+  musicNoteGroup.scale.set(musicNoteGroupParam.scale, musicNoteGroupParam.scale, musicNoteGroupParam.scale);
+  Title.trebleClef.position.set(trebleClefParam.X_POS, trebleClefParam.Y_POS, trebleClefParam.Z_POS);
   Title.scrollText.scale.set(scrollParam.X_SCALE, scrollParam.Y_SCALE, scrollParam.Z_SCALE);
   Title.nameText.position.set(nameTextParam.X_POS, nameTextParam.Y_POS, nameTextParam.Z_POS);
   Title.trumpet.rotation.set(trumpetParam.X_ROT, trumpetParam.Y_ROT, trumpetParam.Z_ROT);
@@ -127,6 +104,7 @@ let position = 0;
 let currScrollY = window.scrollY;
 const maxY = document.documentElement.scrollHeight - document.documentElement.clientHeight;
 let scrollPercent = 0.0;
+
 window.addEventListener('scroll', () => {
   let st = window.pageYOffset || document.documentElement.scrollTop;
   // whether scroll is up or down
@@ -163,6 +141,11 @@ window.addEventListener('scroll', () => {
       X_SCALE: 0.0,
       Y_SCALE: 0.0,
       Z_SCALE: 0.0,
+      ease: 'power2.out'
+    });
+    gsap.to(musicNoteGroupParam, {
+      duration: 0.5,
+      scale: 0.0,
       ease: 'power2.out'
     });
     gsap.to(scene.background, {
@@ -291,6 +274,22 @@ window.addEventListener('scroll', () => {
       ease: 'power2.out'
     });
   }
+  //temp
+  if (position == 8 && !scrollUp && scrollPercent > 0.74) {
+    position = 9;
+    gsap.to(textGroupParam, {
+      duration: 1,
+      X_POS: -253,
+      ease: 'power2.out'
+    });
+    gsap.to(scene.background, {
+      duration: 1,
+      r: 239 / 255,
+      g: 226 / 255,
+      b: 186 / 255,
+      ease: 'power2.out'
+    });
+  }
 
   /**
    * scroll up animations
@@ -322,11 +321,16 @@ window.addEventListener('scroll', () => {
       Z_SCALE: INIT.SCROLL.Z_SCALE,
       ease: 'power2.out'
     });
+    gsap.to(musicNoteGroupParam, {
+      duration: 1,
+      scale: 1,
+      ease: 'power2.out'
+    });
     gsap.to(scene.background, {
       duration: 1.5,
-      r: 239 / 255,
-      g: 226 / 255,
-      b: 186 / 255
+      r: 215 / 255,
+      g: 210 / 255,
+      b: 203 / 255
     });
   }
 
@@ -422,7 +426,7 @@ window.addEventListener('scroll', () => {
       ease: 'power2.out'
     });
   }
-  if (position == 8 && scrollUp && scrollPercent < 0.62) {
+  if (position == 8 && scrollUp && scrollPercent < 0.66) {
     position = 7;
     gsap.to(textGroupParam, {
       duration: 1,
@@ -434,6 +438,22 @@ window.addEventListener('scroll', () => {
       r: 99 / 255,
       g: 38 / 255,
       b: 38 / 255,
+      ease: 'power2.out'
+    });
+  }
+  //temp
+  if (position == 9 && scrollUp && scrollPercent < 0.74) {
+    position = 8;
+    gsap.to(textGroupParam, {
+      duration: 1,
+      X_POS: -223,
+      ease: 'power2.out'
+    });
+    gsap.to(scene.background, {
+      duration: 1,
+      r: 137 / 255,
+      g: 138 / 255,
+      b: 166 / 255,
       ease: 'power2.out'
     });
   }
@@ -467,15 +487,15 @@ timeline
     0 // start time
   )
   .to(
-    nameTextParam,
+    trebleClefParam,
     {
       duration: 12,
-      X_POS: -50,
-      Y_POS: -3,
-      Z_POS: -33,
+      X_POS: -15,
+      Y_POS: 15,
+      Z_POS: -8,
       ease: 'power1.out'
     },
-    12
+    0
   )
   // to make start time a percentage out of 100 from total duration
   .to(nameTextParam, {}, 100);
