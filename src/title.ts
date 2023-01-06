@@ -98,9 +98,9 @@ export default class Title {
 
     // scroll
     // import shaders sus way because normal way doesn't work?????
-    let response = await fetch('/shaders/scrollFragment.glsl');
+    let response = await fetch('./shaders/scrollFragment.glsl');
     const fragment = await response.text();
-    response = await fetch('/shaders/scrollVertex.glsl');
+    response = await fetch('./shaders/scrollVertex.glsl');
     const vertex = await response.text();
 
     const scrollTextGeometry = new TextGeometry('SCROLL TO NAVIGATE  -  SCROLL TO NAVIGATE  -  ', {
