@@ -6,10 +6,13 @@ import Config from './config';
 export default class Repertoire {
   static cylinder: THREE.Mesh<THREE.CylinderGeometry, THREE.MeshBasicMaterial>;
   static textGroup: THREE.Group;
+  static repertoireText: THREE.Mesh<THREE.BufferGeometry, THREE.Material | THREE.Material[]>;
   static INIT: any;
 
-  constructor() {
-    Repertoire.INIT = new Config().INIT;
+  constructor() {}
+  static async init() {
+    this.INIT = new Config().INIT;
+
     // cylinder stuff
     let cylinderGeometry = new THREE.CylinderGeometry(1, 1, 3, 10);
     const material = new THREE.MeshBasicMaterial({
@@ -20,16 +23,34 @@ export default class Repertoire {
     cylinder.position.set(0, -35, -14);
     cylinder.rotation.x = -Math.PI / 8;
     cylinder.rotation.z = -Math.PI / 10;
-    Repertoire.cylinder = cylinder;
-    Repertoire.addSatellite(11, 6);
+    this.cylinder = cylinder;
+    this.addSatellite(11, 6);
+
+    const fontLoader = new FontLoader();
+    const fontStyle = await fontLoader.loadAsync('/Hanken_Grotesk_Regular.json');
+    //title text
+    this.repertoireText = new THREE.Mesh();
+    const textGeometry = new TextGeometry('Repertoire', {
+      font: fontStyle,
+      size: 1,
+      height: 0
+    });
+    const titleText = new THREE.Mesh(
+      textGeometry,
+      new THREE.MeshBasicMaterial({
+        color: 0xffffff
+      })
+    );
+    titleText.position.set(-3.5, -37, -50);
+    titleText.rotation.x = -Math.PI / 4;
+    this.repertoireText = titleText;
 
     // text stuff
     const textGroup = new THREE.Group();
     textGroup.position.set(Repertoire.INIT.TEXT_GROUP.X_POS, 0, 0);
-    textGroup.position.set(-8, 0, 0);
     textGroup.rotation.x = -Math.PI / 4;
-    Repertoire.textGroup = textGroup;
-    Repertoire.addText([
+    this.textGroup = textGroup;
+    const words = [
       'Scheherazade',
       'Festive Overture',
       'Haydn Concerto',
@@ -38,7 +59,24 @@ export default class Repertoire {
       'Yoru ni Kakeru',
       'O Magnum Mysterium',
       'CONTACT ME'
-    ]);
+    ];
+    words.map((e, i) => {
+      const textGeometry = new TextGeometry(e, {
+        font: fontStyle,
+        size: 2,
+        height: 0
+      });
+      const text = new THREE.Mesh(
+        textGeometry,
+        new THREE.MeshBasicMaterial({
+          color: 0xffffff
+        })
+      );
+      //text.position.set(-10 + i, -35, -15);
+      text.position.set(-1 + 35 * i, -16, -36);
+      this.textGroup.add(text);
+    });
+    return new Repertoire();
   }
 
   static addSatellite = (radius: number, amount: number) => {
@@ -66,27 +104,7 @@ export default class Repertoire {
     }
   };
 
-  static addText = async (words: string[]) => {
-    const fontLoader = new FontLoader();
-    const fontStyle = await fontLoader.loadAsync('/Hanken_Grotesk_Regular.json');
-    words.map((e, i) => {
-      const textGeometry = new TextGeometry(e, {
-        font: fontStyle,
-        size: 2,
-        height: 0
-      });
-      const text = new THREE.Mesh(
-        textGeometry,
-        new THREE.MeshBasicMaterial({
-          color: 0xffffff
-        })
-      );
-      //text.position.set(-10 + i, -35, -15);
-      text.position.set(-1 + 35 * i, -16, -36);
-      Repertoire.textGroup.add(text);
-    });
-  };
   static tick = (delta: number) => {
-    Repertoire.cylinder.rotateOnAxis(new THREE.Vector3(0, 1, 0), delta * 0.5);
+    this.cylinder.rotateOnAxis(new THREE.Vector3(0, 1, 0), delta * 0.5);
   };
 }

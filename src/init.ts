@@ -19,7 +19,8 @@ export default class Init {
     scene.add(cameraGroup);
 
     const camera = new THREE.PerspectiveCamera(75, windowSize.width / windowSize.height, 0.1, 1000);
-    cameraGroup.add(camera);
+    //toggle parallax effect
+    //cameraGroup.add(camera);
 
     const renderer = new THREE.WebGLRenderer({
       canvas: document.querySelector('#bg')!,

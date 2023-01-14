@@ -2,7 +2,7 @@ import './style.css';
 import * as THREE from 'three';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/all';
-//import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 import Init from './init';
 import Config from './config';
@@ -25,20 +25,27 @@ const INIT = new Config().INIT;
 /**
  * Header Title
  */
-Title.init().then(() => {
+const arr = [Title.init(), Repertoire.init()];
+Promise.all(arr).then(() => {
+  // add to updatables
   updatables.push(Title);
+  // add meshs to scene
   scene.add(Title.trumpet);
   scene.add(Title.trebleClef);
   scene.add(Title.nameText);
   scene.add(Title.musicianText);
   scene.add(Title.scrollText);
+
   /**
    * repertoire stuff
    */
-  new Repertoire();
   updatables.push(Repertoire);
   scene.add(Repertoire.cylinder);
+  scene.add(Repertoire.repertoireText);
   scene.add(Repertoire.textGroup);
+
+  // animate
+  ScrollTrigger.refresh(true);
   renderer.setAnimationLoop(animate);
 });
 
@@ -60,6 +67,7 @@ let scrollParam = structuredClone(INIT.SCROLL);
 let nameTextParam = structuredClone(INIT.NAME_TEXT);
 let trumpetParam = structuredClone(INIT.TRUMPET);
 let musicianTextParam = structuredClone(INIT.MUSICIAN_TEXT);
+let repertoireTextParam = { scale: 0 };
 let textGroupParam = structuredClone(INIT.TEXT_GROUP);
 
 /**
@@ -82,16 +90,17 @@ const animate = () => {
   Title.trumpet.position.set(trumpetParam.X_POS, trumpetParam.Y_POS, trumpetParam.Z_POS);
   Title.trumpet.scale.set(1, 1, trumpetParam.Z_SCALE);
   Title.musicianText.position.set(musicianTextParam.X_POS, musicianTextParam.Y_POS, musicianTextParam.Z_POS);
+  Repertoire.repertoireText.scale.set(repertoireTextParam.scale, repertoireTextParam.scale, repertoireTextParam.scale);
   Repertoire.textGroup.position.x = textGroupParam.X_POS;
 
   // scroll based animation timeline noob strat - https://sbcode.net/threejs/animate-on-scroll/
   // playTimeLineAnimations();
   // animate cursor parallax - https://tympanus.net/codrops/2022/01/05/crafting-scroll-based-animations-in-three-js/
-  const PARALLAX_SENSE = 100;
-  const parallaxX = -cursor.x;
-  const parallaxY = cursor.y;
-  cameraGroup.position.x += parallaxX - cameraGroup.position.x * delta * PARALLAX_SENSE; // created camera group to get parallax and scroll working
-  cameraGroup.position.y += parallaxY - cameraGroup.position.y * delta * PARALLAX_SENSE; // idk y it works xd
+  const PARALLAX_SENSE = 0.02;
+  const parallaxX = cursor.x * PARALLAX_SENSE;
+  const parallaxY = -cursor.y * PARALLAX_SENSE;
+  cameraGroup.position.x += parallaxX - cameraGroup.position.x * delta; // created camera group to get parallax and scroll working
+  cameraGroup.position.y += parallaxY - cameraGroup.position.y * delta; // idk y it works xd
   renderer.render(scene, camera);
 };
 
@@ -160,23 +169,29 @@ window.addEventListener('scroll', () => {
   if (position == 1 && !scrollUp && scrollPercent > 0.18) {
     position = 2;
     gsap.to(cameraParam, {
-      duration: 2,
+      duration: 3,
       Y_POS: -28,
       Z_POS: -7,
       X_ROT: -Math.PI / 4,
-      onComplete: () => {
-        if (position == 2) {
-          gsap.to(scene.background, {
-            duration: 0.8,
-            r: 2 / 255,
-            g: 56 / 255,
-            b: 60 / 255,
-            ease: 'power2.out'
-          });
-        }
-      },
       ease: 'power2.out'
     });
+    // wait for 2 seconds
+    setTimeout(() => {
+      if (position == 2) {
+        gsap.to(scene.background, {
+          duration: 2,
+          r: 2 / 255,
+          g: 56 / 255,
+          b: 60 / 255,
+          ease: 'power.out'
+        });
+        gsap.to(repertoireTextParam, {
+          duration: 1,
+          scale: 1,
+          ease: 'power2.out'
+        });
+      }
+    }, 1500);
   }
   //festive overture
   if (position == 2 && !scrollUp && scrollPercent > 0.26) {
@@ -333,21 +348,25 @@ window.addEventListener('scroll', () => {
       b: 203 / 255
     });
   }
-
   if (position == 2 && scrollUp && scrollPercent < 0.18) {
     position = 1;
     gsap.to(cameraParam, {
-      duration: 2.5,
+      duration: 3,
       Y_POS: INIT.CAMERA.Y_POS,
       Z_POS: INIT.CAMERA.Z_POS,
       X_ROT: INIT.CAMERA.X_ROT,
       ease: 'power2.out'
     });
     gsap.to(scene.background, {
-      duration: 1.5,
+      duration: 2,
       r: 0,
       g: 0,
       b: 0,
+      ease: 'power2.out'
+    });
+    gsap.to(repertoireTextParam, {
+      duration: 1,
+      scale: 0,
       ease: 'power2.out'
     });
   }
@@ -469,7 +488,7 @@ const timeline = gsap.timeline({
     trigger: '.page',
     start: '0% 0%',
     end: '100% 100%',
-    scrub: true,
+    scrub: 1,
     markers: true,
     onUpdate: animate
   }
@@ -481,8 +500,7 @@ timeline
       duration: 12, // duration
       X_POS: 50,
       Y_POS: 5,
-      Z_POS: -5,
-      ease: 'power1.out'
+      Z_POS: -5
     },
     0 // start time
   )
@@ -492,8 +510,7 @@ timeline
       duration: 12,
       X_POS: -15,
       Y_POS: 15,
-      Z_POS: -8,
-      ease: 'power1.out'
+      Z_POS: -8
     },
     0
   )

@@ -119,7 +119,7 @@ export default class Title {
         fragmentShader: fragment
       })
     );
-    scrollText.position.set(0, -2.5, 0);
+    scrollText.position.set(0, -5, -5);
     this.scrollText = scrollText;
   };
 
