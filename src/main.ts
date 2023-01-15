@@ -25,29 +25,30 @@ const INIT = new Config().INIT;
 /**
  * Header Title
  */
-const arr = [Title.init(), Repertoire.init()];
-Promise.all(arr).then(() => {
-  // add to updatables
-  updatables.push(Title);
-  // add meshs to scene
-  scene.add(Title.trumpet);
-  scene.add(Title.trebleClef);
-  scene.add(Title.nameText);
-  scene.add(Title.musicianText);
-  scene.add(Title.scrollText);
+//const arr = [Title.init(), Repertoire.init()];
+//Promise.all(arr).then(() => {
+// add to updatables
 
-  /**
-   * repertoire stuff
-   */
-  updatables.push(Repertoire);
-  scene.add(Repertoire.cylinder);
-  scene.add(Repertoire.repertoireText);
-  scene.add(Repertoire.textGroup);
+await Promise.all([Title.init(), Repertoire.init()]);
+updatables.push(Title);
+// add mesh to scene
+scene.add(Title.trumpet);
+scene.add(Title.trebleClef);
+scene.add(Title.nameText);
+scene.add(Title.musicianText);
+scene.add(Title.scrollText);
 
-  // animate
-  ScrollTrigger.refresh(true);
-  renderer.setAnimationLoop(animate);
-});
+/**
+ * repertoire stuff
+ */
+updatables.push(Repertoire);
+scene.add(Repertoire.cylinder);
+scene.add(Repertoire.repertoireText);
+scene.add(Repertoire.textGroup);
+
+// animate
+
+//});
 
 // twist deprecated - https://medium.com/@crazypixel/geometry-manipulation-in-three-js-twisting-c53782c38bb
 
@@ -103,6 +104,7 @@ const animate = () => {
   cameraGroup.position.y += parallaxY - cameraGroup.position.y * delta; // idk y it works xd
   renderer.render(scene, camera);
 };
+renderer.setAnimationLoop(animate);
 
 /**
  * scroll animation by current scroll position
