@@ -223,6 +223,8 @@ export default class Init {
     tripleNote.rotation.set(-Math.PI / 2, 0, Math.PI);
     this.musicNoteGroup.add(tripleNote);
     this.scene.add(this.musicNoteGroup);
+
+    let t1 = tripleNote.clone();
   }
 
   tick = (delta: number) => {

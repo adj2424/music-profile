@@ -2,12 +2,13 @@ import './style.css';
 import * as THREE from 'three';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/all';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+//import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 import Init from './init';
 import Config from './config';
 import Repertoire from './repertoire';
-import Title from './title';
+import Name from './name';
+import Musician from './musician';
 
 // all child objects where it will be animated through tick method
 const updatables: any[] = [];
@@ -29,14 +30,14 @@ const INIT = new Config().INIT;
 //Promise.all(arr).then(() => {
 // add to updatables
 
-await Promise.all([Title.init(), Repertoire.init()]);
-updatables.push(Title);
+await Promise.all([Name.init(), Musician.init(), Repertoire.init()]);
+updatables.push(Name);
 // add mesh to scene
-scene.add(Title.trumpet);
-scene.add(Title.trebleClef);
-scene.add(Title.nameText);
-scene.add(Title.musicianText);
-scene.add(Title.scrollText);
+scene.add(Name.trumpet);
+scene.add(Name.trebleClef);
+scene.add(Name.nameText);
+scene.add(Name.scrollText);
+scene.add(Musician.musicianText);
 
 /**
  * repertoire stuff
@@ -46,14 +47,9 @@ scene.add(Repertoire.cylinder);
 scene.add(Repertoire.repertoireText);
 scene.add(Repertoire.textGroup);
 
-// animate
-
-//});
-
 // twist deprecated - https://medium.com/@crazypixel/geometry-manipulation-in-three-js-twisting-c53782c38bb
 
 //animates objects with animations
-const clock = new THREE.Clock();
 function tick(delta: number) {
   for (const obj of updatables) {
     // calls child tick method
@@ -78,19 +74,19 @@ let textGroupParam = structuredClone(INIT.TEXT_GROUP);
 //controls.update();
 const animate = () => {
   // delta for consistency
-  const delta = clock.getDelta();
+  const delta = 0.005;
   tick(delta);
   camera.position.set(cameraParam.X_POS, cameraParam.Y_POS, cameraParam.Z_POS);
   camera.rotation.x = cameraParam.X_ROT;
 
   musicNoteGroup.scale.set(musicNoteGroupParam.scale, musicNoteGroupParam.scale, musicNoteGroupParam.scale);
-  Title.trebleClef.position.set(trebleClefParam.X_POS, trebleClefParam.Y_POS, trebleClefParam.Z_POS);
-  Title.scrollText.scale.set(scrollParam.X_SCALE, scrollParam.Y_SCALE, scrollParam.Z_SCALE);
-  Title.nameText.position.set(nameTextParam.X_POS, nameTextParam.Y_POS, nameTextParam.Z_POS);
-  Title.trumpet.rotation.set(trumpetParam.X_ROT, trumpetParam.Y_ROT, trumpetParam.Z_ROT);
-  Title.trumpet.position.set(trumpetParam.X_POS, trumpetParam.Y_POS, trumpetParam.Z_POS);
-  Title.trumpet.scale.set(1, 1, trumpetParam.Z_SCALE);
-  Title.musicianText.position.set(musicianTextParam.X_POS, musicianTextParam.Y_POS, musicianTextParam.Z_POS);
+  Name.trebleClef.position.set(trebleClefParam.X_POS, trebleClefParam.Y_POS, trebleClefParam.Z_POS);
+  Name.scrollText.scale.set(scrollParam.X_SCALE, scrollParam.Y_SCALE, scrollParam.Z_SCALE);
+  Name.nameText.position.set(nameTextParam.X_POS, nameTextParam.Y_POS, nameTextParam.Z_POS);
+  Name.trumpet.rotation.set(trumpetParam.X_ROT, trumpetParam.Y_ROT, trumpetParam.Z_ROT);
+  Name.trumpet.position.set(trumpetParam.X_POS, trumpetParam.Y_POS, trumpetParam.Z_POS);
+  Name.trumpet.scale.set(1, 1, trumpetParam.Z_SCALE);
+  Musician.musicianText.position.set(musicianTextParam.X_POS, musicianTextParam.Y_POS, musicianTextParam.Z_POS);
   Repertoire.repertoireText.scale.set(repertoireTextParam.scale, repertoireTextParam.scale, repertoireTextParam.scale);
   Repertoire.textGroup.position.x = textGroupParam.X_POS;
 
@@ -105,6 +101,19 @@ const animate = () => {
   renderer.render(scene, camera);
 };
 renderer.setAnimationLoop(animate);
+
+/*
+document.addEventListener('visibilitychange', () => {
+  // check if user is on current page
+  if (document.visibilityState === 'visible') {
+    renderer.setAnimationLoop(animate);
+  }
+  // pause animation
+  else {
+    renderer.setAnimationLoop(null);
+  }
+});
+*/
 
 /**
  * scroll animation by current scroll position

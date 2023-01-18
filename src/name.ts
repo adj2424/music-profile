@@ -4,11 +4,11 @@ import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 import Config from './config';
 
-export default class Title {
+export default class Name {
   static trumpet: THREE.Group;
   static trebleClef: THREE.Group;
   static nameText: THREE.Mesh<THREE.BufferGeometry, THREE.Material | THREE.Material[]>;
-  static musicianText: THREE.Mesh<THREE.BufferGeometry, THREE.Material | THREE.Material[]>;
+
   static scrollText: THREE.Mesh<THREE.BufferGeometry, THREE.Material | THREE.Material[]>;
   static INIT: any;
   static frame: number = 0;
@@ -18,12 +18,11 @@ export default class Title {
   static async init() {
     this.INIT = new Config().INIT;
     this.nameText = new THREE.Mesh();
-    this.musicianText = new THREE.Mesh();
     this.scrollText = new THREE.Mesh();
     await this.createTrumpet();
     await this.createTrebleClef();
     await this.createText();
-    return new Title();
+    return new Name();
   }
 
   static createTrumpet = async () => {
@@ -54,7 +53,6 @@ export default class Title {
   static createText = async () => {
     const fontLoader = new FontLoader();
     let nameText = new THREE.Mesh();
-    let musicianText = new THREE.Mesh();
     let scrollText = new THREE.Mesh();
     const font = await fontLoader.loadAsync('/Hanken_Grotesk_Regular.json');
     // name
@@ -74,27 +72,6 @@ export default class Title {
     nameText.rotateX(this.INIT.NAME_TEXT.X_ROT);
     nameText.rotateZ(this.INIT.NAME_TEXT.Z_ROT);
     this.nameText = nameText;
-
-    // musician
-    const musicianTextGeometry = new TextGeometry('MUSICIAN', {
-      font: font,
-      size: 22,
-      height: 1
-    });
-    musicianText = new THREE.Mesh(
-      musicianTextGeometry,
-      new THREE.MeshBasicMaterial({
-        color: 0xffffff
-      })
-    );
-    musicianText.position.set(
-      this.INIT.MUSICIAN_TEXT.X_POS,
-      this.INIT.MUSICIAN_TEXT.Y_POS,
-      this.INIT.MUSICIAN_TEXT.Z_POS
-    );
-    musicianText.rotation.z = this.INIT.MUSICIAN_TEXT.Z_ROT;
-    musicianText.scale.y = this.INIT.MUSICIAN_TEXT.Y_SCALE;
-    this.musicianText = musicianText;
 
     // scroll
     // import shaders sus way because normal way doesn't work?????
@@ -124,10 +101,10 @@ export default class Title {
   };
 
   static tick = (delta: number) => {
-    Title.scrollText.rotation.z -= 0.35 * delta;
-    Title.trebleClef.position.y += 0.001 * Math.sin(Title.frame);
-    Title.trebleClef.rotation.z += 0.0005 * Math.sin(Title.frame);
-    Title.trebleClef.rotateOnAxis(new THREE.Vector3(0, 1, 0), 0.5 * delta);
-    Title.frame += 0.005;
+    Name.scrollText.rotation.z -= 0.35 * delta;
+    Name.trebleClef.position.y += 0.001 * Math.sin(Name.frame);
+    Name.trebleClef.rotation.z += 0.0005 * Math.sin(Name.frame);
+    Name.trebleClef.rotateOnAxis(new THREE.Vector3(0, 1, 0), 0.5 * delta);
+    Name.frame += 0.005;
   };
 }
