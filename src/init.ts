@@ -20,7 +20,7 @@ export default class Init {
 
     const camera = new THREE.PerspectiveCamera(75, windowSize.width / windowSize.height, 0.1, 1000);
     //toggle parallax effect
-    //cameraGroup.add(camera);
+    cameraGroup.add(camera);
 
     const renderer = new THREE.WebGLRenderer({
       canvas: document.querySelector('#bg')!,
@@ -54,9 +54,9 @@ export default class Init {
      */
     //const lightHelper = new THREE.PointLightHelper(light);
     //scene.add(lightHelper);
-    const gridHelper = new THREE.GridHelper(500);
+    //const gridHelper = new THREE.GridHelper(500);
     //const controls = new OrbitControls(camera, renderer.domElement);
-    scene.add(gridHelper);
+    //scene.add(gridHelper);
 
     /**
      * resize window

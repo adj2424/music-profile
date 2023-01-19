@@ -16,23 +16,21 @@ export default class Repertoire {
   static async init() {
     this.INIT = new Config().INIT;
 
-    // cylinder stuff
+    // music note stuff
     const musicParent = new THREE.Object3D();
     musicParent.position.set(0, -34.5, -12);
     musicParent.rotation.x = -Math.PI / 5;
     musicParent.rotation.z = -Math.PI / 10;
-
     this.musicParent = musicParent;
     await this.addSatellite();
     // generate random frame for each music note for variance
     this.frames = [...Array(this.musicParent.children.length)].map(_ => Math.random() * 10);
     // generate random y axis value for each music note for variance
     this.rotationDirections = [...Array(this.musicParent.children.length)].map(_ => Math.random() * 2 - 1);
-    console.log(this.frames);
 
+    //title text
     const fontLoader = new FontLoader();
     const fontStyle = await fontLoader.loadAsync('/fonts/Hanken_Grotesk_Regular.json');
-    //title text
     this.repertoireText = new THREE.Mesh();
     const textGeometry = new TextGeometry('Repertoire', {
       font: fontStyle,
@@ -142,7 +140,6 @@ export default class Repertoire {
         });
         note = gltf.scene;
         note.rotation.set(-Math.PI / 2, 0, Math.random() * 10);
-
         // check for the big 16th notes and make it smaller by increasing radius
         radius = i !== 2 && i !== 5 ? 16 : 20;
       }
@@ -154,7 +151,6 @@ export default class Repertoire {
 
   static tick = (delta: number) => {
     this.musicParent.rotateOnAxis(new THREE.Vector3(0, 1, 0), delta * 0.4);
-
     this.musicParent.children.map((e, i) => {
       //gltf
       if (i !== 6) {
@@ -164,7 +160,6 @@ export default class Repertoire {
       else {
         e.rotateOnAxis(new THREE.Vector3(0, this.rotationDirections[i], 0), delta * 1.2);
       }
-      //
       e.position.y += 0.006 * Math.sin(this.frames[i]);
       this.frames[i] += 0.005;
     });

@@ -102,7 +102,7 @@ const animate = () => {
   // scroll based animation timeline noob strat - https://sbcode.net/threejs/animate-on-scroll/
   // playTimeLineAnimations();
   // animate cursor parallax - https://tympanus.net/codrops/2022/01/05/crafting-scroll-based-animations-in-three-js/
-  const PARALLAX_SENSE = 0.02;
+  const PARALLAX_SENSE = 0.03;
   const parallaxX = cursor.x * PARALLAX_SENSE;
   const parallaxY = -cursor.y * PARALLAX_SENSE;
   cameraGroup.position.x += parallaxX - cameraGroup.position.x * delta; // created camera group to get parallax and scroll working
@@ -529,8 +529,8 @@ const timeline = gsap.timeline({
     start: '0% 0%',
     end: '100% 100%',
     scrub: 1,
-    markers: true,
     onUpdate: animate
+    //markers: true // for debugging
   }
 });
 timeline
