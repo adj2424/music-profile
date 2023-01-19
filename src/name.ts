@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
+//import fragment from '../shaders/scrollFragment.glsl';
+//import vertex from '../shaders/scrollVertex.glsl';
 import Config from './config';
 
 export default class Name {
@@ -19,9 +21,7 @@ export default class Name {
     this.INIT = new Config().INIT;
     this.nameText = new THREE.Mesh();
     this.scrollText = new THREE.Mesh();
-    await this.createTrumpet();
-    await this.createTrebleClef();
-    await this.createText();
+    await Promise.all([this.createTrumpet(), this.createTrebleClef(), this.createText()]);
     return new Name();
   }
 
@@ -73,12 +73,23 @@ export default class Name {
     nameText.rotateZ(this.INIT.NAME_TEXT.Z_ROT);
     this.nameText = nameText;
 
-    // scroll
-    // import shaders sus way because normal way doesn't work?????
-    let response = await fetch('./shaders/scrollFragment.glsl');
-    const fragment = await response.text();
-    response = await fetch('./shaders/scrollVertex.glsl');
-    const vertex = await response.text();
+    const vertex = `#define PI 3.1415926538
+    uniform float textLength;
+    
+    void main () {
+      float scale = 1.0 / textLength * PI * 1.98;
+      float theta = -position.x * scale;
+      float r = 1.0;
+      float r2 = r + position.y * scale * r;
+      float posX = cos(theta) * r2;
+      float posY = sin(theta) * r2;
+    
+      vec3 p = vec3(posX, posY, position.z);
+      gl_Position = projectionMatrix * modelViewMatrix * vec4 (p, 1.0);
+    }`;
+    const fragment = `void main () {
+      gl_FragColor = vec4(1, 1, 1, 1);
+    }`;
 
     const scrollTextGeometry = new TextGeometry('SCROLL TO NAVIGATE  -  SCROLL TO NAVIGATE  -  ', {
       font: font,

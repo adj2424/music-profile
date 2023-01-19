@@ -22,44 +22,6 @@ updatables.push(world);
 
 // Initial object positions
 const INIT = new Config().INIT;
-
-/**
- * Header Title
- */
-//const arr = [Title.init(), Repertoire.init()];
-//Promise.all(arr).then(() => {
-// add to updatables
-
-await Promise.all([Name.init(), Musician.init(), Repertoire.init()]);
-
-updatables.push(Name);
-scene.add(Name.trumpet);
-scene.add(Name.trebleClef);
-scene.add(Name.nameText);
-scene.add(Name.scrollText);
-
-updatables.push(Musician);
-scene.add(Musician.musicianText);
-scene.add(Musician.groupText);
-
-/**
- * repertoire stuff
- */
-updatables.push(Repertoire);
-scene.add(Repertoire.musicParent);
-scene.add(Repertoire.repertoireText);
-scene.add(Repertoire.textGroup);
-
-// twist deprecated - https://medium.com/@crazypixel/geometry-manipulation-in-three-js-twisting-c53782c38bb
-
-//animates objects with animations
-function tick(delta: number) {
-  for (const obj of updatables) {
-    // calls child tick method
-    (obj as any).tick(delta);
-  }
-}
-
 let cameraParam = structuredClone(INIT.CAMERA);
 let trebleClefParam = structuredClone(INIT.TREBLE_CLEF);
 let musicNoteGroupParam = { scale: 1 };
@@ -71,12 +33,22 @@ let musicianTextGroupParam = { scale: 0 };
 let repertoireTextParam = { scale: 0 };
 let textGroupParam = structuredClone(INIT.TEXT_GROUP);
 
+// twist deprecated - https://medium.com/@crazypixel/geometry-manipulation-in-three-js-twisting-c53782c38bb
+
+//animates objects with animations
+function tick(delta: number) {
+  for (const obj of updatables) {
+    // calls child tick method
+    (obj as any).tick(delta);
+  }
+}
+
 /**
  * animation
  */
 //const controls = new OrbitControls(camera, renderer.domElement);
 //controls.update();
-const animate = () => {
+function animate() {
   // delta for consistency
   const delta = 0.005;
   tick(delta);
@@ -108,8 +80,7 @@ const animate = () => {
   cameraGroup.position.x += parallaxX - cameraGroup.position.x * delta; // created camera group to get parallax and scroll working
   cameraGroup.position.y += parallaxY - cameraGroup.position.y * delta; // idk y it works xd
   renderer.render(scene, camera);
-};
-renderer.setAnimationLoop(animate);
+}
 
 /*
 document.addEventListener('visibilitychange', () => {
@@ -123,6 +94,27 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 */
+
+/**
+ * Header Title
+ */
+Promise.all([Name.init(), Musician.init(), Repertoire.init()]).then(() => {
+  updatables.push(Name);
+  scene.add(Name.trumpet);
+  scene.add(Name.trebleClef);
+  scene.add(Name.nameText);
+  scene.add(Name.scrollText);
+
+  updatables.push(Musician);
+  scene.add(Musician.musicianText);
+  scene.add(Musician.groupText);
+
+  updatables.push(Repertoire);
+  scene.add(Repertoire.musicParent);
+  scene.add(Repertoire.repertoireText);
+  scene.add(Repertoire.textGroup);
+  renderer.setAnimationLoop(animate);
+});
 
 /**
  * scroll animation by current scroll position
@@ -529,7 +521,7 @@ const timeline = gsap.timeline({
     start: '0% 0%',
     end: '100% 100%',
     scrub: 1,
-    onUpdate: animate
+    onUpdate: () => animate()
     //markers: true // for debugging
   }
 });
