@@ -79,7 +79,7 @@ export default class Name {
     void main () {
       float scale = 1.0 / textLength * PI * 1.98;
       float theta = -position.x * scale;
-      float r = 1.0;
+      float r = 1.4;
       float r2 = r + position.y * scale * r;
       float posX = cos(theta) * r2;
       float posY = sin(theta) * r2;
@@ -93,7 +93,7 @@ export default class Name {
 
     const scrollTextGeometry = new TextGeometry('SCROLL TO NAVIGATE  -  SCROLL TO NAVIGATE  -  ', {
       font: font,
-      size: 0.015,
+      size: 0.04,
       height: 0
     });
     scrollText = new THREE.Mesh(
@@ -101,13 +101,13 @@ export default class Name {
       new THREE.ShaderMaterial({
         side: THREE.DoubleSide,
         uniforms: {
-          textLength: { value: 0.479 }
+          textLength: { value: 1.277 }
         },
         vertexShader: vertex,
         fragmentShader: fragment
       })
     );
-    scrollText.position.set(0, -5, -5);
+    scrollText.position.set(0, -5.8, -7);
     this.scrollText = scrollText;
   };
 
