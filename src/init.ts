@@ -53,7 +53,7 @@ export default class Init {
      * helpers
      */
     const lightHelper = new THREE.PointLightHelper(light);
-    scene.add(lightHelper);
+    //scene.add(lightHelper);
     const gridHelper = new THREE.GridHelper(500);
     //const controls = new OrbitControls(camera, renderer.domElement);
     scene.add(gridHelper);
@@ -223,8 +223,6 @@ export default class Init {
     tripleNote.rotation.set(-Math.PI / 2, 0, Math.PI);
     this.musicNoteGroup.add(tripleNote);
     this.scene.add(this.musicNoteGroup);
-
-    let t1 = tripleNote.clone();
   }
 
   tick = (delta: number) => {

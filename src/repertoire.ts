@@ -27,7 +27,7 @@ export default class Repertoire {
     this.addSatellite(11, 6);
 
     const fontLoader = new FontLoader();
-    const fontStyle = await fontLoader.loadAsync('/Hanken_Grotesk_Regular.json');
+    const fontStyle = await fontLoader.loadAsync('/fonts/Hanken_Grotesk_Regular.json');
     //title text
     this.repertoireText = new THREE.Mesh();
     const textGeometry = new TextGeometry('Repertoire', {

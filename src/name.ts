@@ -54,7 +54,7 @@ export default class Name {
     const fontLoader = new FontLoader();
     let nameText = new THREE.Mesh();
     let scrollText = new THREE.Mesh();
-    const font = await fontLoader.loadAsync('/Hanken_Grotesk_Regular.json');
+    const font = await fontLoader.loadAsync('/fonts/Hanken_Grotesk_Regular.json');
     // name
     const nameTextGeometry = new TextGeometry('ALAN JIANG', {
       font: font,

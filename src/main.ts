@@ -1,5 +1,5 @@
 import './style.css';
-import * as THREE from 'three';
+//import * as THREE from 'three';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/all';
 //import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
@@ -31,13 +31,16 @@ const INIT = new Config().INIT;
 // add to updatables
 
 await Promise.all([Name.init(), Musician.init(), Repertoire.init()]);
+
 updatables.push(Name);
-// add mesh to scene
 scene.add(Name.trumpet);
 scene.add(Name.trebleClef);
 scene.add(Name.nameText);
 scene.add(Name.scrollText);
+
+updatables.push(Musician);
 scene.add(Musician.musicianText);
+scene.add(Musician.groupText);
 
 /**
  * repertoire stuff
@@ -64,6 +67,7 @@ let scrollParam = structuredClone(INIT.SCROLL);
 let nameTextParam = structuredClone(INIT.NAME_TEXT);
 let trumpetParam = structuredClone(INIT.TRUMPET);
 let musicianTextParam = structuredClone(INIT.MUSICIAN_TEXT);
+let musicianTextGroupParam = { scale: 0 };
 let repertoireTextParam = { scale: 0 };
 let textGroupParam = structuredClone(INIT.TEXT_GROUP);
 
@@ -86,6 +90,11 @@ const animate = () => {
   Name.trumpet.rotation.set(trumpetParam.X_ROT, trumpetParam.Y_ROT, trumpetParam.Z_ROT);
   Name.trumpet.position.set(trumpetParam.X_POS, trumpetParam.Y_POS, trumpetParam.Z_POS);
   Name.trumpet.scale.set(1, 1, trumpetParam.Z_SCALE);
+  Musician.groupText.scale.set(
+    musicianTextGroupParam.scale,
+    musicianTextGroupParam.scale,
+    musicianTextGroupParam.scale
+  );
   Musician.musicianText.position.set(musicianTextParam.X_POS, musicianTextParam.Y_POS, musicianTextParam.Z_POS);
   Repertoire.repertoireText.scale.set(repertoireTextParam.scale, repertoireTextParam.scale, repertoireTextParam.scale);
   Repertoire.textGroup.position.x = textGroupParam.X_POS;
@@ -144,7 +153,7 @@ window.addEventListener('scroll', () => {
       X_ROT: -0.3,
       Y_ROT: (3 * Math.PI) / 4 - 0.3,
       X_POS: 5,
-      Y_POS: 14,
+      Y_POS: 14.5,
       Z_POS: -30,
       Z_SCALE: 0.8,
       ease: 'power2.out'
@@ -152,8 +161,13 @@ window.addEventListener('scroll', () => {
     gsap.to(musicianTextParam, {
       duration: 1.5,
       X_POS: -72,
-      Y_POS: 0,
+      Y_POS: -1,
       Z_POS: -40,
+      ease: 'power2.out'
+    });
+    gsap.to(musicianTextGroupParam, {
+      duration: 0.49,
+      scale: 1.0,
       ease: 'power2.out'
     });
     gsap.to(scrollParam, {
@@ -184,6 +198,11 @@ window.addEventListener('scroll', () => {
       Y_POS: -28,
       Z_POS: -7,
       X_ROT: -Math.PI / 4,
+      ease: 'power2.out'
+    });
+    gsap.to(musicianTextGroupParam, {
+      duration: 1,
+      scale: 0,
       ease: 'power2.out'
     });
     // wait for 2 seconds
@@ -333,6 +352,10 @@ window.addEventListener('scroll', () => {
       Z_SCALE: INIT.TRUMPET.Z_SCALE,
       ease: 'power2.out'
     });
+    gsap.to(musicianTextGroupParam, {
+      duration: 0.5,
+      scale: 0
+    });
     gsap.to(musicianTextParam, {
       duration: 1.5,
       X_POS: INIT.MUSICIAN_TEXT.X_POS,
@@ -366,6 +389,11 @@ window.addEventListener('scroll', () => {
       Y_POS: INIT.CAMERA.Y_POS,
       Z_POS: INIT.CAMERA.Z_POS,
       X_ROT: INIT.CAMERA.X_ROT,
+      ease: 'power2.out'
+    });
+    gsap.to(musicianTextGroupParam, {
+      duration: 1,
+      scale: 1.0,
       ease: 'power2.out'
     });
     gsap.to(scene.background, {
