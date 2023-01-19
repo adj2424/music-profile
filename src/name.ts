@@ -101,10 +101,10 @@ export default class Name {
   };
 
   static tick = (delta: number) => {
-    Name.scrollText.rotation.z -= 0.35 * delta;
-    Name.trebleClef.position.y += 0.001 * Math.sin(Name.frame);
-    Name.trebleClef.rotation.z += 0.0005 * Math.sin(Name.frame);
-    Name.trebleClef.rotateOnAxis(new THREE.Vector3(0, 1, 0), 0.5 * delta);
-    Name.frame += 0.005;
+    this.scrollText.rotation.z -= 0.35 * delta;
+    this.trebleClef.position.y += 0.001 * Math.sin(this.frame);
+    this.trebleClef.rotation.z += 0.0005 * Math.sin(this.frame);
+    this.trebleClef.rotateOnAxis(new THREE.Vector3(0, 1, 0), 0.5 * delta);
+    this.frame += 0.005;
   };
 }

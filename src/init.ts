@@ -52,7 +52,7 @@ export default class Init {
     /**
      * helpers
      */
-    const lightHelper = new THREE.PointLightHelper(light);
+    //const lightHelper = new THREE.PointLightHelper(light);
     //scene.add(lightHelper);
     const gridHelper = new THREE.GridHelper(500);
     //const controls = new OrbitControls(camera, renderer.domElement);
@@ -132,96 +132,46 @@ export default class Init {
   // maybe add notes randomly and delete them after crossing so its auto gen
   async addMusicNotes() {
     const gltfLoader = new GLTFLoader();
-    let gltf = await gltfLoader.loadAsync('/symbols/16th note2.glb');
-    gltf.scene.traverse(child => {
-      if ((child as THREE.Mesh).isMesh) {
-        (child as THREE.Mesh).material = new THREE.MeshBasicMaterial({
-          color: 0x2d3033
-        });
-      }
-    });
-    const sixteenNote = gltf.scene;
-    sixteenNote.position.set(-18, -5.5, -8);
-    sixteenNote.rotation.set(-Math.PI / 2, 0, Math.PI);
-    this.musicNoteGroup.add(sixteenNote);
+    const sixteenNote = gltfLoader.loadAsync('/symbols/16th note2.glb');
+    const halfNote = gltfLoader.loadAsync('/symbols/half note.glb');
+    const quarterNote = gltfLoader.loadAsync('/symbols/quarter note.glb');
+    const eighthNote = gltfLoader.loadAsync('/symbols/8th note.glb');
+    const sixteenNote2 = gltfLoader.loadAsync('/symbols/16th note5.glb');
+    const wholeNote = gltfLoader.loadAsync('/symbols/whole note.glb');
+    const tripleNote = gltfLoader.loadAsync('/symbols/triple note.glb');
+    const coords = [
+      [-18, -5.5, -8],
+      [-5, -7, -8],
+      [0, -7, -8],
+      [5.25, -6, -8],
+      [14, -6, -8],
+      [26, -7.15, -8],
+      [30.8, -6.15, -8]
+    ];
+    const notes = await Promise.all([
+      sixteenNote,
+      halfNote,
+      quarterNote,
+      eighthNote,
+      sixteenNote2,
+      wholeNote,
+      tripleNote
+    ]);
 
-    gltf = await gltfLoader.loadAsync('/symbols/half note.glb');
-    gltf.scene.traverse(child => {
-      if ((child as THREE.Mesh).isMesh) {
-        (child as THREE.Mesh).material = new THREE.MeshBasicMaterial({
-          color: 0x2d3033
-        });
-      }
-    });
-    const halfNote = gltf.scene;
-    halfNote.position.set(-5, -7, -8);
-    halfNote.rotation.set(-Math.PI / 2, 0, Math.PI);
-    this.musicNoteGroup.add(halfNote);
-
-    gltf = await gltfLoader.loadAsync('/symbols/quarter note.glb');
-    gltf.scene.traverse(child => {
-      if ((child as THREE.Mesh).isMesh) {
-        (child as THREE.Mesh).material = new THREE.MeshBasicMaterial({
-          color: 0x2d3033
-        });
-      }
-    });
-    const quarterNote = gltf.scene;
-    quarterNote.position.set(0, -7, -8);
-    quarterNote.rotation.set(-Math.PI / 2, 0, Math.PI);
-    this.musicNoteGroup.add(quarterNote);
-
-    gltf = await gltfLoader.loadAsync('/symbols/8th note.glb');
-    gltf.scene.traverse(child => {
-      if ((child as THREE.Mesh).isMesh) {
-        (child as THREE.Mesh).material = new THREE.MeshBasicMaterial({
-          color: 0x2d3033
-        });
-      }
-    });
-    const eighthNote = gltf.scene;
-    eighthNote.position.set(5.25, -6, -8);
-    eighthNote.rotation.set(-Math.PI / 2, 0, Math.PI);
-    this.musicNoteGroup.add(eighthNote);
-
-    gltf = await gltfLoader.loadAsync('/symbols/16th note5.glb');
-    gltf.scene.traverse(child => {
-      if ((child as THREE.Mesh).isMesh) {
-        (child as THREE.Mesh).material = new THREE.MeshBasicMaterial({
-          color: 0x2d3033
-        });
-      }
-    });
-    const sixteenNote2 = gltf.scene;
-    sixteenNote2.position.set(14, -6, -8);
-    sixteenNote2.rotation.set(-Math.PI / 2, 0, Math.PI);
-    this.musicNoteGroup.add(sixteenNote2);
-
-    gltf = await gltfLoader.loadAsync('/symbols/whole note.glb');
-    gltf.scene.traverse(child => {
-      if ((child as THREE.Mesh).isMesh) {
-        (child as THREE.Mesh).material = new THREE.MeshBasicMaterial({
-          color: 0x2d3033
-        });
-      }
-    });
-    const wholeNote = gltf.scene;
-    wholeNote.position.set(26, -7.15, -8);
-    wholeNote.rotation.set(-Math.PI / 2, 0, Math.PI);
-    this.musicNoteGroup.add(wholeNote);
-
-    gltf = await gltfLoader.loadAsync('/symbols/triple note.glb');
-    gltf.scene.traverse(child => {
-      if ((child as THREE.Mesh).isMesh) {
-        (child as THREE.Mesh).material = new THREE.MeshBasicMaterial({
-          color: 0x2d3033
-        });
-      }
-    });
-    const tripleNote = gltf.scene;
-    tripleNote.position.set(30.8, -6.15, -8);
-    tripleNote.rotation.set(-Math.PI / 2, 0, Math.PI);
-    this.musicNoteGroup.add(tripleNote);
+    for (let i = 0; i < notes.length; i++) {
+      notes[i].scene.traverse(child => {
+        if ((child as THREE.Mesh).isMesh) {
+          (child as THREE.Mesh).material = new THREE.MeshBasicMaterial({
+            color: 0x2d3033
+          });
+        }
+      });
+      const note = notes[i].scene;
+      const [x, y, z] = coords[i];
+      note.position.set(x, y, z);
+      note.rotation.set(-Math.PI / 2, 0, Math.PI);
+      this.musicNoteGroup.add(note);
+    }
     this.scene.add(this.musicNoteGroup);
   }
 
@@ -230,7 +180,7 @@ export default class Init {
       if (e.position.x < -30) {
         e.position.x = 30;
       }
-      e.position.x -= 2.5 * delta;
+      e.position.x -= 3 * delta;
     });
   };
 }

@@ -46,7 +46,7 @@ scene.add(Musician.groupText);
  * repertoire stuff
  */
 updatables.push(Repertoire);
-scene.add(Repertoire.cylinder);
+scene.add(Repertoire.musicParent);
 scene.add(Repertoire.repertoireText);
 scene.add(Repertoire.textGroup);
 
@@ -144,6 +144,7 @@ window.addEventListener('scroll', () => {
   scrollPercent = currScrollY / maxY;
 
   /**
+   * scroll down and up animation duration must be same or else sus bugs lul
    * scroll down animations
    */
   if (position == 0 && !scrollUp && scrollPercent > 0.05) {
@@ -191,10 +192,10 @@ window.addEventListener('scroll', () => {
     });
   }
   //move camera to scheherazade
-  if (position == 1 && !scrollUp && scrollPercent > 0.18) {
+  if (position == 1 && !scrollUp && scrollPercent > 0.14) {
     position = 2;
     gsap.to(cameraParam, {
-      duration: 3,
+      duration: 2.5,
       Y_POS: -28,
       Z_POS: -7,
       X_ROT: -Math.PI / 4,
@@ -205,37 +206,37 @@ window.addEventListener('scroll', () => {
       scale: 0,
       ease: 'power2.out'
     });
-    // wait for 2 seconds
+    // wait for 1.25 seconds
     setTimeout(() => {
       if (position == 2) {
         gsap.to(scene.background, {
-          duration: 2,
-          r: 2 / 255,
-          g: 56 / 255,
-          b: 60 / 255,
+          duration: 1.5,
+          r: 239 / 255,
+          g: 226 / 255,
+          b: 186 / 255,
           ease: 'power.out'
         });
         gsap.to(repertoireTextParam, {
-          duration: 1,
+          duration: 1.5,
           scale: 1,
           ease: 'power2.out'
         });
       }
-    }, 1500);
+    }, 1000);
   }
   //festive overture
   if (position == 2 && !scrollUp && scrollPercent > 0.26) {
     position = 3;
     gsap.to(textGroupParam, {
-      duration: 1,
+      duration: 1.5,
       X_POS: -44,
       ease: 'power2.out'
     });
     gsap.to(scene.background, {
-      duration: 1,
-      r: 246 / 255,
-      g: 164 / 255,
-      b: 164 / 255,
+      duration: 1.5,
+      r: 233 / 255,
+      g: 119 / 255,
+      b: 119 / 255,
       ease: 'power2.out'
     });
   }
@@ -243,12 +244,12 @@ window.addEventListener('scroll', () => {
   if (position == 3 && !scrollUp && scrollPercent > 0.34) {
     position = 4;
     gsap.to(textGroupParam, {
-      duration: 1,
+      duration: 1.5,
       X_POS: -79,
       ease: 'power2.out'
     });
     gsap.to(scene.background, {
-      duration: 1,
+      duration: 1.5,
       r: 139 / 255,
       g: 211 / 255,
       b: 230 / 255,
@@ -259,15 +260,15 @@ window.addEventListener('scroll', () => {
   if (position == 4 && !scrollUp && scrollPercent > 0.42) {
     position = 5;
     gsap.to(textGroupParam, {
-      duration: 1,
+      duration: 1.5,
       X_POS: -114,
       ease: 'power2.out'
     });
     gsap.to(scene.background, {
-      duration: 1,
-      r: 199 / 255,
-      g: 188 / 255,
-      b: 161 / 255,
+      duration: 1.5,
+      r: 127 / 255,
+      g: 102 / 255,
+      b: 157 / 255,
       ease: 'power2.out'
     });
   }
@@ -275,15 +276,15 @@ window.addEventListener('scroll', () => {
   if (position == 5 && !scrollUp && scrollPercent > 0.5) {
     position = 6;
     gsap.to(textGroupParam, {
-      duration: 1,
+      duration: 1.5,
       X_POS: -145.5,
       ease: 'power2.out'
     });
     gsap.to(scene.background, {
-      duration: 1,
-      r: 127 / 255,
-      g: 102 / 255,
-      b: 157 / 255,
+      duration: 1.5,
+      r: 181 / 255,
+      g: 213 / 255,
+      b: 197 / 255,
       ease: 'power2.out'
     });
   }
@@ -291,15 +292,15 @@ window.addEventListener('scroll', () => {
   if (position == 6 && !scrollUp && scrollPercent > 0.58) {
     position = 7;
     gsap.to(textGroupParam, {
-      duration: 1,
+      duration: 1.5,
       X_POS: -183,
       ease: 'power2.out'
     });
     gsap.to(scene.background, {
-      duration: 1,
-      r: 99 / 255,
-      g: 38 / 255,
-      b: 38 / 255,
+      duration: 1.5,
+      r: 255 / 255,
+      g: 172 / 255,
+      b: 199 / 255,
       ease: 'power2.out'
     });
   }
@@ -307,12 +308,12 @@ window.addEventListener('scroll', () => {
   if (position == 7 && !scrollUp && scrollPercent > 0.66) {
     position = 8;
     gsap.to(textGroupParam, {
-      duration: 1,
+      duration: 1.5,
       X_POS: -223,
       ease: 'power2.out'
     });
     gsap.to(scene.background, {
-      duration: 1,
+      duration: 1.5,
       r: 137 / 255,
       g: 138 / 255,
       b: 166 / 255,
@@ -323,15 +324,15 @@ window.addEventListener('scroll', () => {
   if (position == 8 && !scrollUp && scrollPercent > 0.74) {
     position = 9;
     gsap.to(textGroupParam, {
-      duration: 1,
+      duration: 1.5,
       X_POS: -253,
       ease: 'power2.out'
     });
     gsap.to(scene.background, {
-      duration: 1,
-      r: 239 / 255,
-      g: 226 / 255,
-      b: 186 / 255,
+      duration: 1.5,
+      r: 189 / 255,
+      g: 184 / 255,
+      b: 177 / 255,
       ease: 'power2.out'
     });
   }
@@ -382,10 +383,10 @@ window.addEventListener('scroll', () => {
       b: 203 / 255
     });
   }
-  if (position == 2 && scrollUp && scrollPercent < 0.18) {
+  if (position == 2 && scrollUp && scrollPercent < 0.14) {
     position = 1;
     gsap.to(cameraParam, {
-      duration: 3,
+      duration: 2.5,
       Y_POS: INIT.CAMERA.Y_POS,
       Z_POS: INIT.CAMERA.Z_POS,
       X_ROT: INIT.CAMERA.X_ROT,
@@ -412,42 +413,42 @@ window.addEventListener('scroll', () => {
   if (position == 3 && scrollUp && scrollPercent < 0.26) {
     position = 2;
     gsap.to(textGroupParam, {
-      duration: 1,
+      duration: 1.5,
       X_POS: INIT.TEXT_GROUP.X_POS,
       ease: 'power2.out'
     });
     gsap.to(scene.background, {
-      duration: 0.8,
-      r: 2 / 255,
-      g: 56 / 255,
-      b: 60 / 255,
+      duration: 1.5,
+      r: 239 / 255,
+      g: 226 / 255,
+      b: 186 / 255,
       ease: 'power2.out'
     });
   }
   if (position == 4 && scrollUp && scrollPercent < 0.34) {
     position = 3;
     gsap.to(textGroupParam, {
-      duration: 1,
+      duration: 1.5,
       X_POS: -44,
       ease: 'power2.out'
     });
     gsap.to(scene.background, {
-      duration: 1,
-      r: 246 / 255,
-      g: 164 / 255,
-      b: 164 / 255,
+      duration: 1.5,
+      r: 233 / 255,
+      g: 119 / 255,
+      b: 119 / 255,
       ease: 'power2.out'
     });
   }
   if (position == 5 && scrollUp && scrollPercent < 0.42) {
     position = 4;
     gsap.to(textGroupParam, {
-      duration: 1,
+      duration: 1.5,
       X_POS: -79,
       ease: 'power2.out'
     });
     gsap.to(scene.background, {
-      duration: 1,
+      duration: 1.5,
       r: 139 / 255,
       g: 211 / 255,
       b: 230 / 255,
@@ -457,45 +458,45 @@ window.addEventListener('scroll', () => {
   if (position == 6 && scrollUp && scrollPercent < 0.5) {
     position = 5;
     gsap.to(textGroupParam, {
-      duration: 1,
+      duration: 1.5,
       X_POS: -114,
       ease: 'power2.out'
     });
     gsap.to(scene.background, {
-      duration: 1,
-      r: 199 / 255,
-      g: 188 / 255,
-      b: 161 / 255,
-      ease: 'power2.out'
-    });
-  }
-  if (position == 7 && scrollUp && scrollPercent < 0.58) {
-    position = 6;
-    gsap.to(textGroupParam, {
-      duration: 1,
-      X_POS: -145.5,
-      ease: 'power2.out'
-    });
-    gsap.to(scene.background, {
-      duration: 1,
+      duration: 1.5,
       r: 127 / 255,
       g: 102 / 255,
       b: 157 / 255,
       ease: 'power2.out'
     });
   }
+  if (position == 7 && scrollUp && scrollPercent < 0.58) {
+    position = 6;
+    gsap.to(textGroupParam, {
+      duration: 1.5,
+      X_POS: -145.5,
+      ease: 'power2.out'
+    });
+    gsap.to(scene.background, {
+      duration: 1.5,
+      r: 181 / 255,
+      g: 213 / 255,
+      b: 197 / 255,
+      ease: 'power2.out'
+    });
+  }
   if (position == 8 && scrollUp && scrollPercent < 0.66) {
     position = 7;
     gsap.to(textGroupParam, {
-      duration: 1,
+      duration: 1.5,
       X_POS: -183,
       ease: 'power2.out'
     });
     gsap.to(scene.background, {
-      duration: 1,
-      r: 99 / 255,
-      g: 38 / 255,
-      b: 38 / 255,
+      duration: 1.5,
+      r: 255 / 255,
+      g: 172 / 255,
+      b: 199 / 255,
       ease: 'power2.out'
     });
   }
@@ -503,12 +504,12 @@ window.addEventListener('scroll', () => {
   if (position == 9 && scrollUp && scrollPercent < 0.74) {
     position = 8;
     gsap.to(textGroupParam, {
-      duration: 1,
+      duration: 1.5,
       X_POS: -223,
       ease: 'power2.out'
     });
     gsap.to(scene.background, {
-      duration: 1,
+      duration: 1.5,
       r: 137 / 255,
       g: 138 / 255,
       b: 166 / 255,
