@@ -1,32 +1,120 @@
-canvas {
+.canvas {
   position: fixed;
   top: 0;
   left: 0;
 }
 
-/**
-color themes #14
-https://visme.co/blog/website-color-schemes/
-*/
 body {
-  -ms-overflow-style: none; /* for Internet Explorer, Edge */
-  scrollbar-width: none; /* for Firefox */
+  background: #000;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
   overflow-y: scroll;
   overflow-x: hidden;
 }
 
 body::-webkit-scrollbar {
-  display: none; /* for Chrome, Safari, and Opera */
+  display: none;
 }
 
-main {
-  position: absolute;
+.loader-container {
+  position: fixed;
+  justify-content: center;
   align-items: center;
-  position: relative;
-  color: var(--dark-color);
+  width: 100%;
+  top: 35vh;
+  color: #fff;
+  text-transform: uppercase;
+  text-align: center;
+  font-family: 'Arial', sans-serif;
+  font-size: 15px;
+  letter-spacing: 15px;
 }
-
 .page {
   width: 100%;
   height: 1000vh;
+}
+
+.percent {
+  margin: 10vh;
+}
+
+.preloader-2 {
+  margin-top: 10vh auto 0;
+}
+
+.preloader-1 .line {
+  width: 1px;
+  height: 20px;
+  background: #fff;
+  margin-top: 10px;
+  margin-right: 5px;
+  display: inline-block;
+  animation: opacity-1 1000ms infinite ease-in-out;
+}
+
+.preloader-2 .line {
+  width: 1px;
+  height: 20px;
+  background: #fff;
+  margin-bottom: 10px;
+  margin-right: 5px;
+  display: inline-block;
+  animation: opacity-2 1000ms infinite ease-in-out;
+}
+
+.preloader-1 .line-1,
+.preloader-2 .line-1 {
+  animation-delay: 800ms;
+}
+.preloader-1 .line-2,
+.preloader-2 .line-2 {
+  animation-delay: 600ms;
+}
+.preloader-1 .line-3,
+.preloader-2 .line-3 {
+  animation-delay: 400ms;
+}
+.preloader-1 .line-4,
+.preloader-2 .line-4 {
+  animation-delay: 200ms;
+}
+.preloader-1 .line-6,
+.preloader-2 .line-6 {
+  animation-delay: 200ms;
+}
+.preloader-1 .line-7,
+.preloader-2 .line-7 {
+  animation-delay: 400ms;
+}
+.preloader-1 .line-8,
+.preloader-2 .line-8 {
+  animation-delay: 600ms;
+}
+.preloader-1 .line-9,
+.preloader-2 .line-9 {
+  animation-delay: 800ms;
+}
+
+@keyframes opacity-1 {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes opacity-2 {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }

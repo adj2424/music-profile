@@ -11,20 +11,20 @@ export default class Musician {
   static INIT: any;
 
   constructor() {}
-  static async init() {
+  static async init(loadManager: THREE.LoadingManager) {
     this.INIT = new Config().INIT;
     this.musicianText = new THREE.Mesh();
     this.groupText = new THREE.Group();
     this.topGroup = new THREE.Group();
     this.bottomGroup = new THREE.Group();
-    await this.createText();
+    await this.createText(loadManager);
     this.groupText.add(this.topGroup, this.bottomGroup);
     return new Musician();
   }
 
-  static createText = async () => {
+  static createText = async (loadManager: THREE.LoadingManager) => {
     let musicianText = new THREE.Mesh();
-    const fontLoader = new FontLoader();
+    const fontLoader = new FontLoader(loadManager);
     const hankenRegular = await fontLoader.loadAsync('/fonts/Hanken_Grotesk_Regular.json');
 
     // musician
@@ -49,15 +49,15 @@ export default class Musician {
     this.musicianText = musicianText;
 
     // top text
-    this.createTopText();
+    this.createTopText(loadManager);
     this.topGroup.rotation.z = this.INIT.MUSICIAN_TEXT.Z_ROT;
     // bottom text
-    this.createFancyText();
-    this.createBottomText();
+    this.createFancyText(loadManager);
+    this.createBottomText(loadManager);
     this.bottomGroup.rotation.z = this.INIT.MUSICIAN_TEXT.Z_ROT;
   };
-  static createFancyText = async () => {
-    const fontLoader = new FontLoader();
+  static createFancyText = async (loadManager: THREE.LoadingManager) => {
+    const fontLoader = new FontLoader(loadManager);
     const northwest = await fontLoader.loadAsync('/fonts/Northwest_Signature_Duo_Italic_Regular.json');
     const words: string[] = ['SPECIALIZE', 'EMOTIONAL'];
     const coords: number[][] = [
@@ -81,8 +81,8 @@ export default class Musician {
       this.bottomGroup.add(fancyText);
     }
   };
-  static createTopText = async () => {
-    const fontLoader = new FontLoader();
+  static createTopText = async (loadManager: THREE.LoadingManager) => {
+    const fontLoader = new FontLoader(loadManager);
     const hankenItalic = fontLoader.loadAsync('/fonts/Hanken_Grotesk_ExtraLight_Italic.json');
     const playfairMedium = fontLoader.loadAsync('/fonts/Playfair_Display_Medium_Regular.json');
     const comfortaa = fontLoader.loadAsync('/fonts/Comfortaa_Regular.json');
@@ -116,8 +116,8 @@ export default class Musician {
       this.topGroup.add(topText);
     }
   };
-  static createBottomText = async () => {
-    const fontLoader = new FontLoader();
+  static createBottomText = async (loadManager: THREE.LoadingManager) => {
+    const fontLoader = new FontLoader(loadManager);
     const hankenLight = await fontLoader.loadAsync('/fonts/Hanken_Grotesk_Light_Regular.json');
     // specialize in music for the pursuit of emotional experiences
     const words: string[] = ['IN MUSIC FOR THE PURSUIT OF', 'EXPERIENCES  -  '];

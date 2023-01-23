@@ -17,24 +17,29 @@ export default class Name {
 
   //https://dev.to/somedood/the-proper-way-to-write-async-constructors-in-javascript-1o8c
   constructor() {}
-  static async init() {
+  static async init(loadManager: THREE.LoadingManager) {
     this.INIT = new Config().INIT;
     this.nameText = new THREE.Mesh();
     this.scrollText = new THREE.Mesh();
-    await Promise.all([this.createTrumpet(), this.createTrebleClef(), this.createText()]);
+    await Promise.all([
+      this.createTrumpet(loadManager),
+      this.createTrebleClef(loadManager),
+      this.createText(loadManager)
+    ]);
+
     return new Name();
   }
 
-  static createTrumpet = async () => {
-    const gltfLoader = new GLTFLoader();
+  static createTrumpet = async (loadManager: THREE.LoadingManager) => {
+    const gltfLoader = new GLTFLoader(loadManager);
     const gltf = await gltfLoader.loadAsync('/trumpet/scene.gltf');
     const trumpet = gltf.scene;
     trumpet.position.set(this.INIT.TRUMPET.X_POS, this.INIT.TRUMPET.Y_POS, this.INIT.TRUMPET.Z_POS);
     trumpet.rotation.set(this.INIT.TRUMPET.X_ROT, this.INIT.TRUMPET.Y_ROT, this.INIT.TRUMPET.Z_ROT);
     this.trumpet = trumpet;
   };
-  static createTrebleClef = async () => {
-    const gltfLoader = new GLTFLoader();
+  static createTrebleClef = async (loadManager: THREE.LoadingManager) => {
+    const gltfLoader = new GLTFLoader(loadManager);
     const gltf = await gltfLoader.loadAsync('/treblesus.glb');
     gltf.scene.traverse(child => {
       if ((child as THREE.Mesh).isMesh) {
@@ -50,8 +55,8 @@ export default class Name {
     this.trebleClef = trebleClef;
   };
 
-  static createText = async () => {
-    const fontLoader = new FontLoader();
+  static createText = async (loadManager: THREE.LoadingManager) => {
+    const fontLoader = new FontLoader(loadManager);
     let nameText = new THREE.Mesh();
     let scrollText = new THREE.Mesh();
     const font = await fontLoader.loadAsync('/fonts/Hanken_Grotesk_Regular.json');

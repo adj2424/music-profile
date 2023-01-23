@@ -13,7 +13,7 @@ export default class Repertoire {
   static INIT: any;
 
   constructor() {}
-  static async init() {
+  static async init(loadManager: THREE.LoadingManager) {
     this.INIT = new Config().INIT;
 
     // music note stuff
@@ -22,14 +22,20 @@ export default class Repertoire {
     musicParent.rotation.x = -Math.PI / 5;
     musicParent.rotation.z = -Math.PI / 10;
     this.musicParent = musicParent;
-    await this.addSatellite();
+    await this.addSatellite(loadManager);
     // generate random frame for each music note for variance
     this.frames = [...Array(this.musicParent.children.length)].map(_ => Math.random() * 10);
-    // generate random y axis value for each music note for variance
-    this.rotationDirections = [...Array(this.musicParent.children.length)].map(_ => Math.random() * 2 - 1);
+    // generate spin speed for each music note for variance
+    this.rotationDirections = [...Array(this.musicParent.children.length)].map(_ => {
+      const dir = Math.random() * 2 - 1;
+      if (dir > -0.3 && dir < 0.3) {
+        return dir > 0 ? 0.3 : -0.3;
+      }
+      return dir;
+    });
 
     //title text
-    const fontLoader = new FontLoader();
+    const fontLoader = new FontLoader(loadManager);
     const fontStyle = await fontLoader.loadAsync('/fonts/Hanken_Grotesk_Regular.json');
     this.repertoireText = new THREE.Mesh();
     const textGeometry = new TextGeometry('Repertoire', {
@@ -81,12 +87,12 @@ export default class Repertoire {
     return new Repertoire();
   }
 
-  static addSatellite = async () => {
-    const fontLoader = new FontLoader();
+  static addSatellite = async (loadManager: THREE.LoadingManager) => {
+    const fontLoader = new FontLoader(loadManager);
     //https://fonts.google.com/noto/specimen/Noto+Music/glyphs
     // only misc symbols work????!!!!!!!
     const musicSymbolFont = await fontLoader.loadAsync('/fonts/Noto_Music_Regular.json');
-    const gltfLoader = new GLTFLoader();
+    const gltfLoader = new GLTFLoader(loadManager);
     const sixteenNote = gltfLoader.loadAsync('/symbols/16th note.glb');
     const halfNote = gltfLoader.loadAsync('/symbols/half note.glb');
     const sixteenNote2 = gltfLoader.loadAsync('/symbols/16th note3.glb');

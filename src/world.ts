@@ -7,7 +7,7 @@ export default class Init {
   musicNoteGroup: THREE.Group;
   renderer: THREE.WebGLRenderer;
   cursor: any;
-  constructor() {
+  constructor(loadManager: THREE.LoadingManager) {
     const windowSize = {
       width: window.innerWidth,
       height: window.innerHeight
@@ -91,7 +91,7 @@ export default class Init {
     this.cursor = cursor;
     this.genParticles(80);
     //this.genStars(100);
-    this.addMusicNotes();
+    this.addMusicNotes(loadManager);
   }
 
   // add background stars
@@ -130,8 +130,8 @@ export default class Init {
   }
 
   // maybe add notes randomly and delete them after crossing so its auto gen
-  async addMusicNotes() {
-    const gltfLoader = new GLTFLoader();
+  async addMusicNotes(loadManager: THREE.LoadingManager) {
+    const gltfLoader = new GLTFLoader(loadManager);
     const sixteenNote = gltfLoader.loadAsync('/symbols/16th note2.glb');
     const halfNote = gltfLoader.loadAsync('/symbols/half note.glb');
     const quarterNote = gltfLoader.loadAsync('/symbols/quarter note.glb');

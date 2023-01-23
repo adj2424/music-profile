@@ -1,10 +1,10 @@
 import './style.css';
-//import * as THREE from 'three';
+import * as THREE from 'three';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/all';
 //import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
-import Init from './init';
+import World from './world';
 import Config from './config';
 import Repertoire from './repertoire';
 import Name from './name';
@@ -14,9 +14,24 @@ import Musician from './musician';
 const updatables: any[] = [];
 
 /**
+ * Loading screen
+ */
+const loadManager = new THREE.LoadingManager();
+loadManager.onProgress = (_, loaded, total) => {
+  const progress = document.getElementById('progress')!;
+  progress.innerHTML = ((loaded / total) * 100).toFixed(0) + '%';
+};
+//finished loading assets
+loadManager.onLoad = () => {
+  const loader = document.querySelector('.loader-container') as HTMLElement;
+  loader.style.display = 'none';
+};
+
+/**
  * Set up
  */
-const world = new Init();
+const world = new World(loadManager);
+
 const { scene, camera, cameraGroup, renderer, cursor, musicNoteGroup } = world;
 updatables.push(world);
 
@@ -32,8 +47,6 @@ let musicianTextParam = structuredClone(INIT.MUSICIAN_TEXT);
 let musicianTextGroupParam = { scale: 0 };
 let repertoireTextParam = { scale: 0 };
 let textGroupParam = structuredClone(INIT.TEXT_GROUP);
-
-// twist deprecated - https://medium.com/@crazypixel/geometry-manipulation-in-three-js-twisting-c53782c38bb
 
 //animates objects with animations
 function tick(delta: number) {
@@ -74,7 +87,7 @@ function animate() {
   // scroll based animation timeline noob strat - https://sbcode.net/threejs/animate-on-scroll/
   // playTimeLineAnimations();
   // animate cursor parallax - https://tympanus.net/codrops/2022/01/05/crafting-scroll-based-animations-in-three-js/
-  const PARALLAX_SENSE = 0.03;
+  const PARALLAX_SENSE = 0.02;
   const parallaxX = cursor.x * PARALLAX_SENSE;
   const parallaxY = -cursor.y * PARALLAX_SENSE;
   cameraGroup.position.x += parallaxX - cameraGroup.position.x * delta; // created camera group to get parallax and scroll working
@@ -98,7 +111,7 @@ document.addEventListener('visibilitychange', () => {
 /**
  * Header Title
  */
-Promise.all([Name.init(), Musician.init(), Repertoire.init()]).then(() => {
+Promise.all([Name.init(loadManager), Musician.init(loadManager), Repertoire.init(loadManager)]).then(() => {
   updatables.push(Name);
   scene.add(Name.trumpet);
   scene.add(Name.trebleClef);
@@ -370,9 +383,9 @@ window.addEventListener('scroll', () => {
     });
     gsap.to(scene.background, {
       duration: 1.5,
-      r: 215 / 255,
-      g: 210 / 255,
-      b: 203 / 255
+      r: 189 / 255,
+      g: 184 / 255,
+      b: 177 / 255
     });
   }
   if (position == 2 && scrollUp && scrollPercent < 0.14) {
