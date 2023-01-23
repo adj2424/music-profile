@@ -40,7 +40,7 @@ export default class Name {
   };
   static createTrebleClef = async (loadManager: THREE.LoadingManager) => {
     const gltfLoader = new GLTFLoader(loadManager);
-    const gltf = await gltfLoader.loadAsync('/treblesus.glb');
+    const gltf = await gltfLoader.loadAsync('/treble_clef/scene.glb');
     gltf.scene.traverse(child => {
       if ((child as THREE.Mesh).isMesh) {
         (child as THREE.Mesh).material = new THREE.MeshBasicMaterial({
